@@ -1,6 +1,6 @@
 {% macro upsert_dim_period() %}
     {% set sql %}
-    CREATE TABLE IF NOT EXISTS v1.dim_period (
+    CREATE TABLE IF NOT EXISTS dim_period (
         period_id SERIAL PRIMARY KEY,
         label TEXT UNIQUE,
         period_type TEXT,
@@ -8,7 +8,7 @@
         end_date DATE NOT NULL
     );
 
-    INSERT INTO v1.dim_period (label, period_type, start_date, end_date)
+    INSERT INTO dim_period (label, period_type, start_date, end_date)
     VALUES
       ('Today', 'daily', CURRENT_DATE, CURRENT_DATE),
       ('Yesterday', 'daily', CURRENT_DATE - INTERVAL '1 day', CURRENT_DATE - INTERVAL '1 day'),
