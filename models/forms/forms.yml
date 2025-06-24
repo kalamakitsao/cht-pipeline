@@ -1,38 +1,285 @@
 version: 1
 
 models:
-  - name: data_record
-    config:
-      tags: ["base"]
-      contract:
-        enforced: true
+  - name: over_five_assessment
     columns:
       - name: uuid
         data_type: string
         constraints:
-          - type: foreign_key
-            expression: "{{ env_var('POSTGRES_SCHEMA') }}.document_metadata (uuid) ON DELETE CASCADE"
           - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
         data_tests:
           - not_null
-          - relationships:
-              to: ref('document_metadata')
-              field: uuid
       - name: saved_timestamp
         data_type: timestamp
-      - name: reported
-        data_type: timestamp with time zone
-      - name: form
+  - name: u5_assessment
+    columns:
+      - name: uuid
         data_type: string
-      - name: from_phone
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: immunization_service
+    columns:
+      - name: uuid
         data_type: string
-      - name: patient_id
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: postnatal_care_service
+    columns:
+      - name: uuid
         data_type: string
-      - name: place_id
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: postnatal_care_service_newborn
+    columns:
+      - name: uuid
         data_type: string
-      - name: contact_uuid
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: cha_verbal_autopsy
+    columns:
+      - name: uuid
         data_type: string
-      - name: parent_uuid
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: community_event
+    columns:
+      - name: uuid
         data_type: string
-      - name: grandparent_uuid
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: socio_economic_survey
+    columns:
+      - name: uuid
         data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: wash
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: pregnancy_home_visit
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: family_planning
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: death_report
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: referral_follow_up
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: defaulter_follow_up
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: immunization_status
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: immunization
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: contact_screening_at_registration
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
+  - name: death_review
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+  - name: hh_flood_status
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  - name: household_visit
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  - name: moh_515_summary
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  - name: moh_515_cha_verified
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  - name: moh_515_scfp_verified
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  - name: moh_515_scfp_rejected
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+

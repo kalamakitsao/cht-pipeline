@@ -1,9 +1,8 @@
 version: 1
 
 models:
-  - name: contact
+  - name: population_demographics
     config:
-      tags: ["base"]
       contract:
         enforced: true
     columns:
@@ -11,53 +10,36 @@ models:
         data_type: string
         constraints:
           - type: foreign_key
-            expression: "{{ env_var('POSTGRES_SCHEMA') }}.document_metadata (uuid) ON DELETE CASCADE"
-          - type: unique
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.contact (uuid) ON DELETE CASCADE"
         data_tests:
           - not_null
-          - unique
           - relationships:
-              to: ref('document_metadata')
+              to: ref('contact')
               field: uuid
       - name: saved_timestamp
         data_type: timestamp
-        data_tests:
-          - not_null
-      - name: reported
-        data_type: timestamp with time zone
-        data_tests:
-          - not_null
-      - name: parent_uuid
-        data_type: string
       - name: name
         data_type: string
-        data_tests:
-          - not_null
-      - name: contact_type
+      - name: reported
+        data_type: timestamp with time zone
+      - name: sex
         data_type: string
-        data_tests:
-          - not_null
-      - name: active
+      - name: date_of_birth
+        data_type: date
+      - name: chp_id
         data_type: string
-      - name: notes
+      - name: chp_area_id
+        data_type: string
+      - name: chu_id
         data_type: string
       - name: muted
         data_type: string
-  - name: contact_type
-    config:
-      tags: ["base"]
-      contract:
-        enforced: true
-    columns:
-      - name: id
+      - name: household_id
         data_type: string
-      - name: person
-        data_type: boolean
-      - name: configured
-        data_type: boolean
-  - name: person
+      - name: household_reported_date
+        data_type: timestamp with time zone
+  - name: chp_hierarchy
     config:
-      tags: ["base"]
       contract:
         enforced: true
     columns:
@@ -68,58 +50,64 @@ models:
             expression: "{{ env_var('POSTGRES_SCHEMA') }}.contact (uuid) ON DELETE CASCADE"
         data_tests:
           - not_null
-          - unique
           - relationships:
               to: ref('contact')
               field: uuid
       - name: saved_timestamp
         data_type: timestamp
-      - name: sex
+      - name: county_name
         data_type: string
-      - name: patient_id
+      - name: sub_county_name
+        data_type: string
+      - name: chu_name
+        data_type: string
+      - name: chu_code
+        data_type: string
+      - name: chp_area_uuid
+        data_type: string
+      - name: chp_area_name
         data_type: string
       - name: phone
         data_type: string
-      - name: phone2
+      - name: chp_id
         data_type: string
-  - name: place
-    config:
-      tags: ["base"]
-      contract:
-        enforced: true
+      - name: chp_muted
+        data_type: string
+      - name: chu_uuid
+        data_type: string
+  - name: patient_f_client
     columns:
       - name: uuid
         data_type: string
         constraints:
+          - type: unique
           - type: foreign_key
             expression: "{{ env_var('POSTGRES_SCHEMA') }}.contact (uuid) ON DELETE CASCADE"
         data_tests:
           - not_null
-          - relationships:
-              to: ref('contact')
-              field: uuid
       - name: saved_timestamp
         data_type: timestamp
-      - name: place_id
-        data_type: string
-      - name: contact_id
-        data_type: string
-  - name: patient
-    config:
-      contract:
-        enforced: true
+  - name: household
     columns:
       - name: uuid
         data_type: string
         constraints:
+          - type: unique
           - type: foreign_key
             expression: "{{ env_var('POSTGRES_SCHEMA') }}.contact (uuid) ON DELETE CASCADE"
         data_tests:
           - not_null
-          - relationships:
-              to: ref('contact')
-              field: uuid
       - name: saved_timestamp
         data_type: timestamp
-      - name: patient_id
+  - name: echis_community_units
+    columns:
+      - name: uuid
         data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.contact (uuid) ON DELETE CASCADE"
+        data_tests:
+          - not_null
+      - name: saved_timestamp
+        data_type: timestamp
