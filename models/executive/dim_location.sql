@@ -1,6 +1,8 @@
 {{ config(
-    materialized='table',
+    materialized='incremental',
+    unique_key='location_id',
     tags=["dimension", "location"],
+    on_schema_change='append_new_columns',
     post_hook=[
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_dim_location_location_id ON {{ this }} (location_id)",
         "CREATE INDEX IF NOT EXISTS idx_dim_location_level ON {{ this }} (level)",
@@ -25,3 +27,6 @@ WHERE contact_type IN (
     'c_community_health_unit',
     'd_community_health_volunteer_area'
 )
+{% if is_incremental() %}
+  AND saved_timestamp >= {{ max_existing_timestamp('saved_timestamp') }}
+{% endif %}
