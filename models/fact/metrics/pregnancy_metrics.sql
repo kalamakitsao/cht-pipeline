@@ -35,8 +35,12 @@ base_pnc AS (
 ),
 
 currently_pregnant AS (
-    SELECT b.cha_id AS location_id, p.period_id, 'currently_pregnant' AS metric_id,
-           COUNT(DISTINCT b.patient_id) AS value
+    SELECT
+        b.cha_id AS location_id,
+        p.period_id,
+        'currently_pregnant' AS metric_id,
+        COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_TIMESTAMP AS last_updated
     FROM base_phv b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
     WHERE COALESCE(b.is_currently_pregnant, FALSE) OR COALESCE(b.is_new_pregnancy, FALSE)
@@ -44,8 +48,12 @@ currently_pregnant AS (
 ),
 
 teen_pregnancies AS (
-    SELECT b.cha_id AS location_id, p.period_id, 'teen_pregnancies' AS metric_id,
-           COUNT(DISTINCT b.patient_id) AS value
+    SELECT
+        b.cha_id AS location_id,
+        p.period_id,
+        'teen_pregnancies' AS metric_id,
+        COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_TIMESTAMP AS last_updated
     FROM base_phv b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
     WHERE (COALESCE(b.is_currently_pregnant, FALSE) OR COALESCE(b.is_new_pregnancy, FALSE))
@@ -54,8 +62,12 @@ teen_pregnancies AS (
 ),
 
 pregnant_referred AS (
-    SELECT b.cha_id AS location_id, p.period_id, 'pregnant_women_referred' AS metric_id,
-           COUNT(DISTINCT b.patient_id) AS value
+    SELECT
+        b.cha_id AS location_id,
+        p.period_id,
+        'pregnant_women_referred' AS metric_id,
+        COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_TIMESTAMP AS last_updated
     FROM base_phv b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
     WHERE b.has_been_referred = TRUE
@@ -63,8 +75,12 @@ pregnant_referred AS (
 ),
 
 skilled_birth_attendance AS (
-    SELECT b.cha_id AS location_id, p.period_id, 'skilled_birth_attendance' AS metric_id,
-           COUNT(DISTINCT b.patient_id) AS value
+    SELECT
+        b.cha_id AS location_id,
+        p.period_id,
+        'skilled_birth_attendance' AS metric_id,
+        COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_TIMESTAMP AS last_updated
     FROM base_pnc b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
     WHERE b.place_of_delivery = 'health_facility'
@@ -72,8 +88,12 @@ skilled_birth_attendance AS (
 ),
 
 deliveries AS (
-    SELECT b.cha_id AS location_id, p.period_id, 'deliveries' AS metric_id,
-           COUNT(DISTINCT b.patient_id) AS value
+    SELECT
+        b.cha_id AS location_id,
+        p.period_id,
+        'deliveries' AS metric_id,
+        COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_TIMESTAMP AS last_updated
     FROM base_pnc b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
     WHERE b.pnc_service_count = 1
