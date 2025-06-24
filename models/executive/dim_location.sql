@@ -19,7 +19,8 @@ SELECT
         WHEN 'c_community_health_unit' THEN 'community unit'
         WHEN 'd_community_health_volunteer_area' THEN 'chp area'
     END AS level,
-    parent_uuid AS parent_id
+    parent_uuid AS parent_id,
+    saved_timestamp
 FROM {{ ref('contact') }}
 WHERE contact_type IN (
     'a_county',
