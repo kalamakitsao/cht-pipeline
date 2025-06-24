@@ -4,12 +4,12 @@
     materialized = 'table',
     indexes = [
       {"columns": ["location_id", "period_id", "metric_id"], "unique": true},
-      {"columns": ["chp_area"], "name": "idx_mv_summary_chp_area"},
-      {"columns": ["county"], "name": "idx_mv_summary_county"},
-      {"columns": ["period_label"], "name": "idx_mv_summary_period_label"},
-      {"columns": ["metric_group"], "name": "idx_mv_summary_metric_group"},
-      {"columns": ["period_start", "period_end"], "name": "idx_mv_summary_period_range"},
-      {"columns": ["last_updated"], "name": "idx_mv_summary_last_updated"}
+      {"columns": ["chp_area"]},
+      {"columns": ["county"]},
+      {"columns": ["period_label"]},
+      {"columns": ["metric_group"]},
+      {"columns": ["period_start", "period_end"]},
+      {"columns": ["last_updated"]}
     ]
 ) }}
 

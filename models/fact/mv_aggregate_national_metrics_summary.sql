@@ -3,10 +3,10 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      {"columns": ["period_id", "metric_id"], "unique": true, "name": "idx_mv_national_unique_period_metric"},
-      {"columns": ["period_start", "period_end"], "name": "idx_mv_national_period_dates"},
-      {"columns": ["metric_group", "metric"], "name": "idx_mv_national_metric_group"},
-      {"columns": ["period_label"], "name": "idx_mv_national_period_label"}
+      {"columns": ["period_id", "metric_id"], "unique": true},
+      {"columns": ["period_start", "period_end"]},
+      {"columns": ["metric_group", "metric"]},
+      {"columns": ["period_label"]}
     ]
 ) }}
 
