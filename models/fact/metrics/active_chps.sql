@@ -27,7 +27,7 @@ period_mapped AS (
 ),
 
 aggregated AS (
-    SELECT location_id, period_id, COUNT(*) AS value
+    SELECT location_id, period_id, 1 AS value
     FROM period_mapped
     GROUP BY location_id, period_id
 )
