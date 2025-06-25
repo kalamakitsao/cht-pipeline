@@ -43,6 +43,11 @@ unpivoted AS (
     SELECT location_id, reported_date, patient_id, 'referred_hypertension' AS metric_id
     FROM filtered_data
     WHERE is_referred_hypertension IS TRUE
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'over_5_assessments' AS metric_id
+    FROM filtered_data
 ),
 
 with_periods AS (
