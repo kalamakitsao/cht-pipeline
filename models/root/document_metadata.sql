@@ -28,3 +28,5 @@ WITH source_records AS (
     WHERE saved_timestamp > (SELECT MAX(saved_timestamp) FROM {{ this }})
   {% endif %}
 )
+
+SELECT * FROM source_records
