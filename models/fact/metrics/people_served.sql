@@ -20,13 +20,17 @@ WITH base AS (
     GROUP BY records.grandparent_uuid, records.reported::DATE
 ),
 
+periods AS (
+    SELECT * FROM {{ ref('dim_period') }}
+),
+
 with_periods AS (
     SELECT
         b.location_id,
         p.period_id,
         SUM(b.value) AS value
     FROM base b
-    JOIN {{ ref('dim_period') }} p ON b.report_date BETWEEN p.start_date AND p.end_date
+    JOIN periods p ON b.report_date BETWEEN p.start_date AND p.end_date
     GROUP BY b.location_id, p.period_id
     HAVING SUM(b.value) > 0
 )
