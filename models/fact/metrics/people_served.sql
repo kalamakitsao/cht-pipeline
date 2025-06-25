@@ -6,33 +6,29 @@
     on_schema_change = 'ignore'
 ) }}
 
-WITH base AS (
+WITH raw_counts AS (
     SELECT
         records.grandparent_uuid AS location_id,
-        records.reported::DATE AS report_date,
+        DATE(records.reported) AS report_date,
         COUNT(DISTINCT records.patient_id) AS value
     FROM {{ ref('data_record') }} records
-    WHERE 
-        records.grandparent_uuid IN (
-            SELECT location_id FROM {{ ref('dim_location') }} WHERE level = 'chp area'
-        )
-        AND records.patient_id IS NOT NULL
-    GROUP BY records.grandparent_uuid, records.reported::DATE
+    WHERE records.grandparent_uuid IN (
+        SELECT location_id FROM {{ ref('dim_location') }}
+    )
+      AND records.patient_id IS NOT NULL
+    GROUP BY records.grandparent_uuid, DATE(records.reported)
 ),
 
-periods AS (
-    SELECT * FROM {{ ref('dim_period') }}
-),
-
-with_periods AS (
+joined AS (
     SELECT
-        b.location_id,
+        rc.location_id,
         p.period_id,
-        SUM(b.value) AS value
-    FROM base b
-    JOIN periods p ON b.report_date BETWEEN p.start_date AND p.end_date
-    GROUP BY b.location_id, p.period_id
-    HAVING SUM(b.value) > 0
+        SUM(rc.value) AS value
+    FROM raw_counts rc
+    JOIN {{ ref('dim_period') }} p
+      ON rc.report_date BETWEEN p.start_date AND p.end_date
+    GROUP BY rc.location_id, p.period_id
+    HAVING SUM(rc.value) > 0
 )
 
 SELECT
@@ -41,4 +37,4 @@ SELECT
     'people_served' AS metric_id,
     value,
     CURRENT_TIMESTAMP AS last_updated
-FROM with_periods
+FROM joined
