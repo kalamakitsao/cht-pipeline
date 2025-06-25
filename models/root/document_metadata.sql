@@ -21,9 +21,11 @@ WITH source_records AS (
     _deleted,
     saved_timestamp,
     doc->>'type' as doc_type,
-  split_part(source, '/', 1) AS instance,
-  split_part(source, '/', 2) AS dbname
+    split_part(source, '/', 1) AS instance,
+    split_part(source, '/', 2) AS dbname
   FROM {{ source('couchdb', env_var('POSTGRES_TABLE')) }} source_table
+  {% if is_incremental() %}
+    WHERE saved_timestamp > (SELECT MAX(saved_timestamp) FROM {{ this }})
+  {% endif %}
 )
 
-{{ batch_incremental('source_records') }}
