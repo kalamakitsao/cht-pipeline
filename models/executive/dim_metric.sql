@@ -48,5 +48,8 @@ FROM (
         ('maternal_deaths', 'Maternal Deaths', 'Birth and Death Reporting', 'Any death reported of a woman within 42 days of delivery or currently pregnant.', 'count'),
         ('neonatal_deaths', 'Neonatal Deaths', 'Birth and Death Reporting', 'Any death reported of a child within 28 days of birth.', 'count'),
         ('child_deaths', 'Child Deaths', 'Birth and Death Reporting', 'Any death reported of a child aged between 29 days and 5 years.', 'count'),
-        ('total_deaths', 'Total Deaths', 'Birth and Death Reporting', 'Total number of death reports submitted by CHPs.', 'count')
+        ('total_deaths', 'Total Deaths', 'Birth and Death Reporting', 'Total number of death reports submitted by CHPs.', 'count'),
+        ('monthly_cu_meetings','Monthly feedback meeting', 'CHP Performance','Participation in Monthly feedback meeting (mandatory)', 'count'),
+        ('other_community_events','Other Community events', 'CHP Performance','Participation in other community events e.g. action days', 'count')
+        
 ) AS t (metric_id, name, group_name, description, unit)

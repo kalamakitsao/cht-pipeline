@@ -35,3 +35,5 @@ UNION ALL
 SELECT * FROM {{ ref('ncd_metrics') }}
 UNION ALL
 SELECT * FROM {{ ref('chps_with_households') }}
+UNION ALL
+SELECT * FROM {{ ref('community_events_participation') }}
