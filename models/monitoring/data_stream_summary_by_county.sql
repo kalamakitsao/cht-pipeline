@@ -29,7 +29,7 @@ reports_with_location AS (
         lh.county,
         d.reported
     FROM {{ ref('data_record') }} d
-    JOIN location_hierarchy lh ON lh.chp_area_id = d.grandparent_uuid
+    JOIN location_hierarchy lh ON lh.chp_area_id = d.parent_uuid
     WHERE d.reported >= CURRENT_DATE - INTERVAL '3 days'
 ),
 
