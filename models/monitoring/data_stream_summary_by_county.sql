@@ -16,39 +16,31 @@ WITH location_hierarchy AS (
       AND chp_area.name !~ '^[0-9]+$'
 ),
 
-contacts_with_location AS (
+agg_contacts AS (
     SELECT
         lh.county,
-        c.reported
+        COUNT(*) AS contact_count
     FROM {{ ref('contact') }} c
     JOIN location_hierarchy lh ON lh.chp_area_id = c.parent_uuid
+    GROUP BY lh.county
 ),
 
-reports_with_location AS (
+agg_reports AS (
     SELECT
         lh.county,
-        d.reported
+        COUNT(*) AS report_count,
+        MIN(d.reported) AS earliest_report,
+        MAX(d.reported) AS latest_report
     FROM {{ ref('data_record') }} d
     JOIN location_hierarchy lh ON lh.chp_area_id = d.parent_uuid
     WHERE d.reported >= CURRENT_DATE - INTERVAL '3 days'
-),
-
-aggregated AS (
-    SELECT
-        COALESCE(c.county, r.county) AS county,
-        COUNT(c.reported) AS contact_count,
-        COUNT(r.reported) AS report_count,
-        MIN(r.reported) AS earliest_report,
-        MAX(r.reported) AS latest_report
-    FROM contacts_with_location c
-    FULL OUTER JOIN reports_with_location r ON c.county = r.county
-    GROUP BY COALESCE(c.county, r.county)
+    GROUP BY lh.county
 )
-
 SELECT
-    county,
-    contact_count,
-    report_count,
-    earliest_report,
-    latest_report
-FROM aggregated
+    COALESCE(c.county, r.county) AS county,
+    COALESCE(c.contact_count, 0) AS contact_count,
+    COALESCE(r.report_count, 0) AS report_count,
+    r.earliest_report,
+    r.latest_report
+FROM agg_contacts c
+FULL OUTER JOIN agg_reports r ON c.county = r.county
