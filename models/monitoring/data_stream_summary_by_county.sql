@@ -1,75 +1,74 @@
 {{ config(
-  materialized = 'incremental',
-  unique_key = ['county', 'period_id'],
-  on_schema_change = 'append_new_columns',
-  tags = ['snapshot', 'daily_summary']
+    materialized = 'incremental',
+    unique_key = ['county', 'snapshot_date'],
+    on_schema_change = 'ignore',
+    tags = ['daily_snapshot'],
+    partition_by = {'field': 'snapshot_date', 'data_type': 'date'}
 ) }}
 
-WITH chp_areas AS (
-  SELECT
-    chp.location_id AS chp_area_id,
-    county.name AS county
-  FROM {{ ref('dim_location') }} chp
-  LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp.parent_id
-  LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
-  LEFT JOIN {{ ref('dim_location') }} county ON county.location_id = sub.parent_id
-  WHERE chp.level = 'chp area'
-    AND chp.name !~ '^[0-9]+$'
+WITH snapshot_date AS (
+    SELECT CURRENT_DATE AS snapshot_date
 ),
 
-periods AS (
-  SELECT * FROM {{ ref('dim_period') }}
+location_hierarchy AS (
+    SELECT
+        chp_area.location_id AS chp_area_id,
+        county.name AS county
+    FROM {{ ref('dim_location') }} chp_area
+    LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp_area.parent_id
+    LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
+    LEFT JOIN {{ ref('dim_location') }} county ON county.location_id = sub.parent_id
+    WHERE chp_area.level = 'chp area'
+      AND chp_area.name !~ '^[0-9]+$'
+      AND county.name IS NOT NULL
 ),
 
--- Contact counts from registered clients
-client_contacts AS (
-  SELECT
-    hh.chv_area_id AS chp_area_id,
-    p.period_id,
-    COUNT(clients.uuid) AS contact_count
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.reported <= p.end_date
-  WHERE hh.chv_area_id IS NOT NULL
-  GROUP BY hh.chv_area_id, p.period_id
+contacts_by_county AS (
+    SELECT
+        lh.county,
+        COUNT(*) AS contact_count
+    FROM {{ ref('patient_f_client') }} c
+    JOIN {{ ref('household') }} h ON c.household_id = h.uuid
+    JOIN location_hierarchy lh ON lh.chp_area_id = h.chv_area_id
+    GROUP BY lh.county
 ),
 
--- Reports within the last 3 days
-recent_reports AS (
-  SELECT
-    d.parent_uuid AS chp_area_id,
-    p.period_id,
-    COUNT(*) AS report_count,
-    MIN(d.reported) AS earliest_report,
-    MAX(d.reported) AS latest_report
-  FROM {{ ref('data_record') }} d
-  JOIN periods p ON d.reported BETWEEN p.start_date AND p.end_date
-  WHERE d.reported >= CURRENT_DATE - INTERVAL '3 days'
-    AND d.parent_uuid IS NOT NULL
-  GROUP BY d.parent_uuid, p.period_id
+reports_by_county AS (
+    SELECT
+        lh.county,
+        COUNT(*) AS report_count,
+        MIN(d.reported) AS earliest_report,
+        MAX(d.reported) AS latest_report
+    FROM {{ ref('data_record') }} d
+    JOIN location_hierarchy lh ON lh.chp_area_id = d.parent_uuid
+    GROUP BY lh.county
 ),
 
--- Combine metrics by chp_area_id
 aggregated AS (
-  SELECT
-    COALESCE(cc.period_id, rr.period_id) AS period_id,
-    ca.county,
-    COALESCE(cc.contact_count, 0) AS contact_count,
-    COALESCE(rr.report_count, 0) AS report_count,
-    rr.earliest_report,
-    rr.latest_report
-  FROM chp_areas ca
-  LEFT JOIN client_contacts cc ON cc.chp_area_id = ca.chp_area_id
-  LEFT JOIN recent_reports rr ON rr.chp_area_id = ca.chp_area_id AND rr.period_id = cc.period_id
+    SELECT
+        COALESCE(c.county, r.county) AS county,
+        COALESCE(c.contact_count, 0) AS contact_count,
+        COALESCE(r.report_count, 0) AS report_count,
+        r.earliest_report,
+        r.latest_report
+    FROM contacts_by_county c
+    FULL OUTER JOIN reports_by_county r ON c.county = r.county
+),
+
+filtered AS (
+    SELECT *
+    FROM aggregated
+    WHERE county IS NOT NULL
+      AND county !~* 'janet.*'  -- exclude misclassified areas
 )
 
 SELECT
-  county,
-  period_id,
-  contact_count,
-  report_count,
-  earliest_report,
-  latest_report,
-  CURRENT_TIMESTAMP AS last_updated
-FROM aggregated
-WHERE county IS NOT NULL
+    county,
+    contact_count,
+    report_count,
+    earliest_report,
+    latest_report,
+    sd.snapshot_date,
+    CURRENT_TIMESTAMP AS last_updated
+FROM filtered
+CROSS JOIN snapshot_date sd
