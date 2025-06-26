@@ -29,5 +29,5 @@ WHERE contact_type IN (
     'd_community_health_volunteer_area'
 )
 {% if is_incremental() %}
-  AND saved_timestamp >= {{ max_existing_timestamp('saved_timestamp') }}
+  AND saved_timestamp > (SELECT MAX(saved_timestamp) FROM {{ this }})
 {% endif %}
