@@ -8,15 +8,15 @@
 
 WITH raw_counts AS (
     SELECT
-        records.grandparent_uuid AS location_id,
+        records.parent_uuid AS location_id,
         DATE(records.reported) AS report_date,
         COUNT(DISTINCT records.patient_id) AS value
     FROM {{ ref('data_record') }} records
-    WHERE records.grandparent_uuid IN (
+    WHERE records.parent_uuid IN (
         SELECT location_id FROM {{ ref('dim_location') }}
     )
       AND records.patient_id IS NOT NULL
-    GROUP BY records.grandparent_uuid, DATE(records.reported)
+    GROUP BY records.parent_uuid, DATE(records.reported)
 ),
 
 joined AS (
