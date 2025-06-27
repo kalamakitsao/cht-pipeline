@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      {"columns": ["community_unit", "period_id", "metric_id"], "unique": true},
+      {"columns": ["county", "sub_county", "community_unit", "period_id", "metric_id"], "unique": true},
       {"columns": ["period_label"]},
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
