@@ -41,3 +41,5 @@ UNION ALL
 SELECT * FROM {{ ref('population_male') }}
 UNION ALL
 SELECT * FROM {{ ref('population_female') }}
+UNION ALL
+SELECT * FROM {{ ref('revised_active_chps') }}
