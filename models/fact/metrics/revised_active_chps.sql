@@ -13,9 +13,26 @@ WITH hh_visits AS (
     GROUP BY location_id, period_id
 ),
 
+county_location AS (
+    SELECT
+        county.name AS county,
+        chp_area.location_id
+    FROM {{ ref('dim_location') }} chp_area
+    LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp_area.parent_id
+    LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
+    LEFT JOIN {{ ref('dim_location') }} county ON county.location_id = sub.parent_id
+    WHERE chp_area.level = 'chp area'
+      AND chp_area.name !~ '^[0-9]+$'
+    GROUP BY county.name, chp_area.location_id
+),
+
 expected_workload AS (
-    SELECT location_id, expected_households_per_month
-    FROM {{ ref('chp_expected_workload') }}
+    SELECT
+        loc.location_id,
+        e.county,
+        e.expected_households_per_month
+    FROM {{ ref('chp_expected_workload') }} e
+    JOIN county_location loc ON loc.county = e.county
 ),
 
 referrals AS (
