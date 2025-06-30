@@ -11,11 +11,16 @@ WITH filtered_data AS (
         o.reported_by_parent AS location_id,
         o.reported::DATE AS reported_date,
         o.patient_id,
+        p.sex,
         o.screened_for_diabetes,
         o.is_referred_diabetes,
         o.screened_for_hypertension,
-        o.is_referred_hypertension
+        o.is_referred_hypertension,
+        o.screened_for_mental_health,
+        o.is_referred_mental_health,
+        o.has_been_referred
     FROM {{ ref('over_five_assessment') }} o
+        join {{ ref('patient_f_client') }} p on o.patient_id = p.uuid
     WHERE o.reported_by_parent IN (
         SELECT location_id FROM {{ ref('dim_location') }} WHERE level = 'chp area'
     )
@@ -28,15 +33,51 @@ unpivoted AS (
 
     UNION ALL
 
+    SELECT location_id, reported_date, patient_id, 'screened_diabetes_male' AS metric_id
+    FROM filtered_data
+    WHERE screened_for_diabetes IS TRUE AND sex = 'male'
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'screened_diabetes_female' AS metric_id
+    FROM filtered_data
+    WHERE screened_for_diabetes IS TRUE AND sex = 'female'
+
+    UNION ALL
+
     SELECT location_id, reported_date, patient_id, 'referred_diabetes' AS metric_id
     FROM filtered_data
     WHERE is_referred_diabetes IS TRUE
 
     UNION ALL
 
+    SELECT location_id, reported_date, patient_id, 'referred_diabetes_male' AS metric_id
+    FROM filtered_data
+    WHERE is_referred_diabetes IS TRUE  AND sex = 'male'
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'referred_diabetes_female' AS metric_id
+    FROM filtered_data
+    WHERE is_referred_diabetes IS TRUE  AND sex = 'female'
+
+    UNION ALL
+
     SELECT location_id, reported_date, patient_id, 'screened_hypertension' AS metric_id
     FROM filtered_data
-    WHERE screened_for_hypertension IS TRUE
+    WHERE screened_for_hypertension IS TRUE  AND sex = 'male'
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'screened_hypertension_male' AS metric_id
+    FROM filtered_data
+    WHERE screened_for_hypertension IS TRUE  AND sex = 'male'
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'screened_hypertension_female' AS metric_id
+    FROM filtered_data
+    WHERE screened_for_hypertension IS TRUE  AND sex = 'female'
 
     UNION ALL
 
@@ -46,6 +87,72 @@ unpivoted AS (
 
     UNION ALL
 
+    SELECT location_id, reported_date, patient_id, 'referred_hypertension_male' AS metric_id
+    FROM filtered_data
+    WHERE is_referred_hypertension IS TRUE  AND sex = 'male'
+
+    UNION ALL
+    
+    SELECT location_id, reported_date, patient_id, 'referred_hypertension_female' AS metric_id
+    FROM filtered_data
+    WHERE is_referred_hypertension IS TRUE   AND sex = 'female'
+
+    UNION ALL
+    
+    SELECT location_id, reported_date, patient_id, 'screened_mental_health' AS metric_id
+    FROM filtered_data
+    WHERE screened_for_mental_health IS TRUE 
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'screened_for_mental_health_male' AS metric_id
+    FROM filtered_data
+    WHERE screened_for_mental_health IS TRUE  AND sex = 'male'
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'screened_for_mental_health_female' AS metric_id
+    FROM filtered_data
+    WHERE screened_for_mental_health IS TRUE  AND sex = 'female'
+
+    UNION ALL
+    
+    SELECT location_id, reported_date, patient_id, 'referred_mental_health' AS metric_id
+    FROM filtered_data
+    WHERE is_referred_mental_health IS TRUE
+
+    UNION ALL
+
+    SELECT location_id, reported_date, patient_id, 'referred_mental_health_male' AS metric_id
+    FROM filtered_data
+    WHERE is_referred_hypertension IS TRUE  AND sex = 'male'
+
+    UNION ALL
+    
+    SELECT location_id, reported_date, patient_id, 'referred_hmental_health_female' AS metric_id
+    FROM filtered_data
+    WHERE is_referred_mental_health IS TRUE   AND sex = 'female'
+
+    UNION ALL
+    
+    SELECT location_id, reported_date, patient_id, 'over_5_referred' AS metric_id
+    FROM filtered_data
+    WHERE has_been_referred IS TRUE
+
+    UNION ALL
+    
+    SELECT location_id, reported_date, patient_id, 'over_5_referred_male' AS metric_id
+    FROM filtered_data
+    WHERE has_been_referred IS TRUE AND sex = 'male'
+
+    UNION ALL
+    
+    SELECT location_id, reported_date, patient_id, 'over_5_referred_female' AS metric_id
+    FROM filtered_data
+    WHERE has_been_referred IS TRUE AND sex = 'female'
+
+    UNION ALL
+    
     SELECT location_id, reported_date, patient_id, 'over_5_assessments' AS metric_id
     FROM filtered_data
 ),
