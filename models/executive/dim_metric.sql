@@ -81,5 +81,7 @@ FROM (
         ('over_5_assessments', 'Over 5 Assessments', 'NCDs (Chronic Illnesses)', 'Number of assessments on over 5s', 'count'),
         ('monthly_cu_meetings','Monthly feedback meeting', 'CHP Performance','Participation in Monthly feedback meeting (mandatory)', 'count'),
         ('other_community_events','Other Community events', 'CHP Performance','Participation in other community events e.g. action days', 'count'),
-        ('revised_active_chps', 'Revised Active CHPs', 'CHP Performance', 'Number of CHPs who scored at least 80% based on visits, referrals, assessments, and community events', 'count')
+        ('revised_active_chps', 'Revised Active CHPs', 'CHP Performance', 'Number of CHPs who scored at least 80% based on visits, referrals, assessments, and community events', 'count'),
+        ('population_male', 'Male Population', 'Households and Population registration', 'Total number of males registered in eCHIS', 'count'),
+        ('population_female', 'Female Population', 'Households and Population registration', 'Total number of females registered in eCHIS', 'count')
 ) AS t (metric_id, name, group_name, description, unit)
