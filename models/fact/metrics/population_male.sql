@@ -45,7 +45,7 @@ muted AS (
 ),
 
 aggregated AS (
-  SELECT r.location_id, r.period_id, 'population' AS metric_id,
+  SELECT r.location_id, r.period_id, 'population_male' AS metric_id,
          pax_registered - COALESCE(d.pax_deaths, 0) - COALESCE(m.pax_muted, 0) AS value
   FROM registrations r
   LEFT JOIN deaths d ON r.location_id = d.location_id AND r.period_id = d.period_id
