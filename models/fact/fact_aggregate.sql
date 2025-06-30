@@ -37,3 +37,7 @@ UNION ALL
 SELECT * FROM {{ ref('chps_with_households') }}
 UNION ALL
 SELECT * FROM {{ ref('community_events_participation') }}
+UNION ALL
+SELECT * FROM {{ ref('population_male') }}
+UNION ALL
+SELECT * FROM {{ ref('population_female') }}
