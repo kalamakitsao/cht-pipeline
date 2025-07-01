@@ -129,7 +129,7 @@ unpivoted AS (
 
     UNION ALL
     
-    SELECT location_id, reported_date, patient_id, 'referred_hmental_health_female' AS metric_id
+    SELECT location_id, reported_date, patient_id, 'referred_mental_health_female' AS metric_id
     FROM filtered_data
     WHERE is_referred_mental_health IS TRUE   AND sex = 'female'
 
