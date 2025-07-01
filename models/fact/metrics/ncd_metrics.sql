@@ -125,7 +125,7 @@ unpivoted AS (
 
     SELECT location_id, reported_date, patient_id, 'referred_mental_health_male' AS metric_id
     FROM filtered_data
-    WHERE is_referred_hypertension IS TRUE  AND sex = 'male'
+    WHERE is_referred_mental_health IS TRUE  AND sex = 'male'
 
     UNION ALL
     
