@@ -57,7 +57,7 @@ metrics_unpivoted AS (
 
     UNION ALL
 
-    SELECT cha_id, report_date, 'u5_malaria_cases', COUNT(DISTINCT CASE WHEN has_malaria THEN patient_id END)
+    SELECT cha_id, report_date, 'u5_confirmed_malaria_cases', COUNT(DISTINCT CASE WHEN has_malaria THEN patient_id END)
     FROM base
     GROUP BY cha_id, report_date
 
@@ -87,7 +87,7 @@ metrics_unpivoted AS (
 
     UNION ALL
 
-    SELECT cha_id, report_date, 'referred_for_diarrhoes', COUNT(DISTINCT CASE WHEN has_diarrhoea AND has_been_referred THEN patient_id END)
+    SELECT cha_id, report_date, 'referred_for_diarrhoea', COUNT(DISTINCT CASE WHEN has_diarrhoea AND has_been_referred THEN patient_id END)
     FROM base
     GROUP BY cha_id, report_date
 
@@ -118,12 +118,6 @@ metrics_unpivoted AS (
     UNION ALL
 
     SELECT cha_id, report_date, 'u5_treated', COUNT(DISTINCT CASE WHEN gave_ors OR gave_amox OR gave_al OR gave_zinc THEN patient_id END)
-    FROM base
-    GROUP BY cha_id, report_date
-
-    UNION ALL
-
-    SELECT cha_id, report_date, 'u5_treated_malaria', COUNT(DISTINCT CASE WHEN has_been_referred THEN patient_id END)
     FROM base
     GROUP BY cha_id, report_date
 
