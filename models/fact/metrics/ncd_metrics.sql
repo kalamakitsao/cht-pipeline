@@ -65,7 +65,7 @@ unpivoted AS (
 
     SELECT location_id, reported_date, patient_id, 'screened_hypertension' AS metric_id
     FROM filtered_data
-    WHERE screened_for_hypertension IS TRUE  AND sex = 'male'
+    WHERE screened_for_hypertension IS TRUE
 
     UNION ALL
 
@@ -105,13 +105,13 @@ unpivoted AS (
 
     UNION ALL
 
-    SELECT location_id, reported_date, patient_id, 'screened_for_mental_health_male' AS metric_id
+    SELECT location_id, reported_date, patient_id, 'screened_mental_health_male' AS metric_id
     FROM filtered_data
     WHERE screened_for_mental_health IS TRUE  AND sex = 'male'
 
     UNION ALL
 
-    SELECT location_id, reported_date, patient_id, 'screened_for_mental_health_female' AS metric_id
+    SELECT location_id, reported_date, patient_id, 'screened_mental_health_female' AS metric_id
     FROM filtered_data
     WHERE screened_for_mental_health IS TRUE  AND sex = 'female'
 
