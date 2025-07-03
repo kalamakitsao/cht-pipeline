@@ -29,7 +29,7 @@ FROM (
         ('under_1_immunised_female', 'Female Under 1 Year Fully Immunised', 'Child Health (<5 years)', 'Number of female children under 1 year who are fully immunised', 'count'),
         ('referred_immunization', 'Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Children Referred for Defaulting on their Immunization Schedule', 'count'),
         ('referred_immunization_male', 'Boys Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Boys Referred for Defaulting on their Immunization Schedule', 'count'),
-        ('referred_immunization_female', 'Girls Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Girls Referred for Defaulting on their Immunization Schedule'),
+        ('referred_immunization_female', 'Girls Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Girls Referred for Defaulting on their Immunization Schedule','count'),
         ('referred_for_pneumonia', 'Referred for Pneumonia', 'Child Health (<5 years)', 'Children Referred for Suspected Pneumonia', 'count'),
         ('referred_for_malnutrition', 'Referred for Malnutrition', 'Child Health (<5 years)', 'Children Referred for Suspected Malnutrition', 'count'),
         ('referred_for_dirrhoea', 'Referred for Diarrhoea', 'Child Health (<5 years)', 'Children Referred for Suspected Diarrhoea', 'count'),
