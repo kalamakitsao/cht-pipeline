@@ -24,6 +24,8 @@ WITH base AS (
     LEFT JOIN {{ ref('dim_location') }} county ON county.location_id = sub.parent_id
     WHERE chp_area.level = 'chp area'
       AND chp_area.name !~ '^[0-9]+$'
+      AND county.name IS NOT NULL
+      AND county.level = 'county'
 )
 
 SELECT * FROM base

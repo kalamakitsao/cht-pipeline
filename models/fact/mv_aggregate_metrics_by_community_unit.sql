@@ -34,6 +34,8 @@ JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
 WHERE chp_area.level = 'chp area'
   AND chp_area.name !~ '^[0-9]+$'
+  AND county_loc.name IS NOT NULL
+  AND county_loc.level = 'county'
 GROUP BY
     chu.name,
     sub.name,

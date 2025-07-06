@@ -21,6 +21,7 @@ location_hierarchy AS (
     WHERE chp_area.level = 'chp area'
       AND chp_area.name !~ '^[0-9]+$'
       AND county.name IS NOT NULL
+      AND county.level = 'county'
 ),
 
 contacts_by_county AS (
