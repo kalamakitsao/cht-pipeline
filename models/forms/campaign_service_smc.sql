@@ -33,7 +33,9 @@
   NULLIF(couchdb.doc -> 'fields' -> 'smc_treatment' ->> 'no_blister_packs_used', '') AS blister_packs_used,
   NULLIF(couchdb.doc -> 'fields' -> 'smc_treatment' ->> 'calc_blister_open', '') AS blister_open_method,
   NULLIF(couchdb.doc -> 'fields' -> 'smc_treatment' ->> 'redose', '') AS redose,
-  
+  NULLIF(couchdb.doc -> 'fields' -> 'smc_treatment' ->> 'received_spaq', '') AS received_spaq,
+  NULLIF(couchdb.doc -> 'fields' -> 'smc_treatment' ->> 'conduct_malaria', '') AS conduct_malaria,
+  NULLIF(couchdb.doc -> 'fields' -> 'smc_treatment' ->> 'when_give_smc_drugs', '') AS when_give_smc_drugs,
   -- Medication quantities
   NULLIF(couchdb.doc -> 'fields' -> 'additional_doc' -> 'fields' ->> 'calc_pink_spaq_blister_packs', '') AS calc_pink_spaq,
   NULLIF(couchdb.doc -> 'fields' -> 'additional_doc' -> 'fields' ->> 'calc_green_spaq_blister_packs', '') AS calc_green_spaq,
