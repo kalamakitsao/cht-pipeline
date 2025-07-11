@@ -2,33 +2,38 @@
 -- Add logic to count unique patients served per period
 {{ config(
     materialized = 'incremental',
-    unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    unique_key = ['snapshot_date', 'location_id', 'period_id', 'metric_id'],
+    on_schema_change='append_new_columns'
 ) }}
 
-WITH raw_counts AS (
+WITH patient_events AS (
     SELECT
-        records.parent_uuid AS location_id,
-        DATE(records.reported) AS report_date,
-        COUNT(DISTINCT records.patient_id) AS value
-    FROM {{ ref('data_record') }} records
-    WHERE records.parent_uuid IN (
-        SELECT location_id FROM {{ ref('dim_location') }}
-    )
-      AND records.patient_id IS NOT NULL
-    GROUP BY records.parent_uuid, DATE(records.reported)
+        dr.parent_uuid AS location_id,
+        DATE(dr.reported) AS report_date,
+        dr.patient_id
+    FROM {{ ref('data_record') }} dr
+    WHERE dr.parent_uuid IN (SELECT location_id FROM {{ ref('dim_location') }})
+      AND dr.patient_id IS NOT NULL
 ),
 
-joined AS (
+with_periods AS (
     SELECT
-        rc.location_id,
         p.period_id,
-        SUM(rc.value) AS value
-    FROM raw_counts rc
+        e.location_id,
+        e.patient_id
+    FROM patient_events e
     JOIN {{ ref('dim_period') }} p
-      ON rc.report_date BETWEEN p.start_date AND p.end_date
-    GROUP BY rc.location_id, p.period_id
-    HAVING SUM(rc.value) > 0
+      ON e.report_date BETWEEN p.start_date AND p.end_date
+),
+
+deduped AS (
+    SELECT
+        location_id,
+        period_id,
+        COUNT(DISTINCT patient_id) AS value
+    FROM with_periods
+    GROUP BY location_id, period_id
+    HAVING COUNT(DISTINCT patient_id) > 0
 )
 
 SELECT
@@ -36,5 +41,6 @@ SELECT
     period_id,
     'people_served' AS metric_id,
     value,
+    CURRENT_DATE AS snapshot_date,
     CURRENT_TIMESTAMP AS last_updated
-FROM joined
+FROM deduped

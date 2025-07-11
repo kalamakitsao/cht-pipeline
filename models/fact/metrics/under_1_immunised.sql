@@ -2,8 +2,8 @@
 -- Add logic to compute fully immunized under-1 children
 {{ config(
     materialized = 'incremental',
-    unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    unique_key = ['snapshot_date', 'location_id', 'period_id', 'metric_id'],
+    on_schema_change='append_new_columns'
 ) }}
 
 WITH immunized AS (
@@ -34,5 +34,6 @@ SELECT
     period_id,
     'under_1_immunised' AS metric_id,
     value,
+    CURRENT_DATE AS snapshot_date,
     CURRENT_TIMESTAMP AS last_updated
 FROM with_periods

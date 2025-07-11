@@ -2,7 +2,8 @@
     materialized='table',
     full_refresh=true,
     tags=["period", "daily_refresh"],
-    post_hook="ANALYZE {{ this }}"
+    post_hook="ANALYZE {{ this }}",
+    on_schema_change='append_new_columns',
 ) }}
 
 WITH periods AS (
@@ -38,11 +39,18 @@ WITH periods AS (
            DATE_TRUNC('quarter', CURRENT_DATE - INTERVAL '3 months'),
            DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '1 day'
     UNION ALL
+    SELECT 'Last Year', 'yearly',
+           DATE_TRUNC('year', CURRENT_DATE - INTERVAL '1 year'),
+           DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '1 day'
+    UNION ALL
     SELECT 'Year to Date (YTD)', 'yearly',
            DATE_TRUNC('year', CURRENT_DATE), CURRENT_DATE
+    UNION ALL
+    -- New: All Time
+    SELECT 'All Time', 'all_time', DATE '2020-01-01', CURRENT_DATE
 )
 
 SELECT
-    row_number() OVER () AS period_id, -- or use a surrogate key later
+    row_number() OVER () AS period_id,
     *
 FROM periods

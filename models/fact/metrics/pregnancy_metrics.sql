@@ -2,8 +2,8 @@
 -- Add logic for currently pregnant, teen pregnancies, referred, deliveries
 {{ config(
     materialized = 'incremental',
-    unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    unique_key = ['snapshot_date', 'location_id', 'period_id', 'metric_id'],
+    on_schema_change='append_new_columns'
 ) }}
 
 WITH period_dates AS (
@@ -40,6 +40,7 @@ currently_pregnant AS (
         p.period_id,
         'currently_pregnant' AS metric_id,
         COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_DATE AS snapshot_date,
         CURRENT_TIMESTAMP AS last_updated
     FROM base_phv b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
@@ -53,6 +54,7 @@ teen_pregnancies AS (
         p.period_id,
         'teen_pregnancies' AS metric_id,
         COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_DATE AS snapshot_date,
         CURRENT_TIMESTAMP AS last_updated
     FROM base_phv b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
@@ -67,6 +69,7 @@ pregnant_referred AS (
         p.period_id,
         'pregnant_women_referred' AS metric_id,
         COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_DATE AS snapshot_date,
         CURRENT_TIMESTAMP AS last_updated
     FROM base_phv b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
@@ -80,6 +83,7 @@ skilled_birth_attendance AS (
         p.period_id,
         'skilled_birth_attendance' AS metric_id,
         COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_DATE AS snapshot_date,
         CURRENT_TIMESTAMP AS last_updated
     FROM base_pnc b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
@@ -93,6 +97,7 @@ deliveries AS (
         p.period_id,
         'deliveries' AS metric_id,
         COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_DATE AS snapshot_date,
         CURRENT_TIMESTAMP AS last_updated
     FROM base_pnc b
     JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
