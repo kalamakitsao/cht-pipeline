@@ -9,12 +9,16 @@
     ]
 ) }}
 
+WITH location_hierarchy AS (
+    SELECT
+        chp_area_id,
+        county
+    FROM {{ ref('mv_location_hierarchy') }}
+)
+
 SELECT
     'county' AS level,
-    county_loc.name AS county,
-    NULL AS sub_county,
-    NULL AS community_unit,
-    NULL AS chp_area,
+    lh.county,
     dp.start_date AS period_start,
     dp.end_date AS period_end,
     dp.label AS period_label,
@@ -26,18 +30,11 @@ SELECT
     fa.metric_id,
     MAX(fa.last_updated) AS last_updated
 FROM {{ ref('fact_aggregate') }} fa
-JOIN {{ ref('dim_location') }} chp_area ON chp_area.location_id = fa.location_id
-LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp_area.parent_id
-LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
-LEFT JOIN {{ ref('dim_location') }} county_loc ON county_loc.location_id = sub.parent_id
+JOIN location_hierarchy lh ON lh.chp_area_id = fa.location_id
 JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
-WHERE chp_area.level = 'chp area'
-  AND chp_area.name !~ '^[0-9]+$'
-  AND county_loc.name IS NOT NULL
-  AND county_loc.level = 'county'
 GROUP BY
-    county_loc.name,
+    lh.county,
     dp.start_date,
     dp.end_date,
     dp.label,

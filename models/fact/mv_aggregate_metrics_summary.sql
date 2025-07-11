@@ -15,19 +15,12 @@
 
 WITH location_hierarchy AS (
     SELECT
-        chp_area.location_id AS chp_area_id,
-        chp_area.name AS chp_area,
-        chu.name AS community_unit,
-        sub.name AS sub_county,
-        county.name AS county
-    FROM {{ ref('dim_location') }} chp_area
-    LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp_area.parent_id
-    LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
-    LEFT JOIN {{ ref('dim_location') }} county ON county.location_id = sub.parent_id
-    WHERE chp_area.level = 'chp area'
-      AND chp_area.name !~ '^[0-9]+$'
-      AND county.name IS NOT NULL
-      AND county.level = 'county'
+        chp_area_id,
+        chp_area,
+        community_unit,
+        sub_county,
+        county
+    FROM {{ ref('mv_location_hierarchy') }}
 ),
 aggregates AS (
     SELECT

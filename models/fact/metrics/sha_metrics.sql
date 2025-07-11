@@ -2,8 +2,8 @@
 -- Add logic to compute households_assessed_sha and households_with_sha
 {{ config(
     materialized = 'incremental',
-    unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    unique_key = ['snapshot_date', 'location_id', 'period_id', 'metric_id'],
+    on_schema_change='append_new_columns'
 ) }}
 
 WITH latest_sha_registration AS (
@@ -59,6 +59,7 @@ SELECT
     period_id,
     metric_id,
     value,
+    CURRENT_DATE AS snapshot_date,
     CURRENT_TIMESTAMP AS last_updated
 FROM unpivoted
 WHERE value > 0

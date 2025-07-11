@@ -1,8 +1,8 @@
 -- models/fact/metrics/population.sql
 {{ config(
     materialized = 'incremental',
-    unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    unique_key = ['snapshot_date', 'location_id', 'period_id', 'metric_id'],
+    on_schema_change='append_new_columns'
 ) }}
 
 WITH periods AS (
@@ -13,217 +13,133 @@ valid_locations AS (
   SELECT location_id FROM {{ ref('dim_location') }}
 ),
 
--- Main population
-registrations AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS pax_registered
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.reported <= p.end_date
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  GROUP BY hh.chv_area_id, p.period_id
+clients AS (
+  SELECT
+    c.uuid,
+    c.household_id,
+    c.sex,
+    c.date_of_birth,
+    c.muted,
+    c.reported
+  FROM {{ ref('patient_f_client') }} c
+),
+
+households AS (
+  SELECT h.uuid, h.chv_area_id
+  FROM {{ ref('household') }} h
 ),
 
 deaths AS (
-  SELECT d.reported_by_parent AS location_id, p.period_id, COUNT(DISTINCT d.uuid) AS pax_deaths
+  SELECT
+    d.uuid,
+    d.patient_id,
+    d.reported_by_parent AS location_id,
+    d.date_of_death,
+    d.patient_age_in_days
   FROM {{ ref('death_report') }} d
+),
+
+base AS (
+  SELECT
+    hh.chv_area_id AS location_id,
+    p.period_id,
+    cl.uuid AS client_id,
+    cl.sex,
+    cl.date_of_birth,
+    cl.muted,
+    cl.reported,
+    AGE(p.end_date, cl.date_of_birth) < INTERVAL '5 years' AS is_u5,
+    cl.sex = 'male' AS is_male,
+    cl.sex = 'female' AS is_female,
+    cl.muted ~ '^[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}' AND cl.muted::DATE BETWEEN p.start_date AND p.end_date AS is_muted,
+    cl.muted ~ '^[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}' AND cl.muted::DATE BETWEEN p.start_date AND p.end_date AND AGE(p.end_date, cl.date_of_birth) < INTERVAL '5 years' AS is_u5_muted
+  FROM clients cl
+  JOIN households hh ON cl.household_id = hh.uuid
+  JOIN periods p ON cl.reported <= p.end_date
+  JOIN valid_locations l ON hh.chv_area_id = l.location_id
+),
+
+joined_deaths AS (
+  SELECT
+    d.uuid,
+    d.location_id,
+    p.period_id,
+    d.patient_id,
+    d.patient_age_in_days,
+    c.sex
+  FROM deaths d
   JOIN periods p ON d.date_of_death BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON d.reported_by_parent = l.location_id
-  GROUP BY d.reported_by_parent, p.period_id
+  LEFT JOIN {{ ref('patient_f_client') }} c ON d.patient_id = c.uuid
+  JOIN valid_locations l ON d.location_id = l.location_id
 ),
 
-muted AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS pax_muted
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.muted ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' AND clients.muted::DATE BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  WHERE clients.muted IS NOT NULL
-  GROUP BY hh.chv_area_id, p.period_id
-),
+aggregated AS (
 
--- Under 5
-under_5_raw AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS u5_registered
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.date_of_birth IS NOT NULL
-                 AND clients.reported <= p.end_date
-                 AND AGE(p.end_date, clients.date_of_birth) < INTERVAL '5 years'
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  GROUP BY hh.chv_area_id, p.period_id
-),
+  SELECT b.location_id, b.period_id, 'population' AS metric_id,
+         COUNT(DISTINCT client_id) 
+         - COUNT(DISTINCT CASE WHEN is_muted THEN client_id END)
+         - COUNT(DISTINCT jd.uuid) FILTER (WHERE jd.location_id = b.location_id AND jd.period_id = b.period_id) AS value
+  FROM base b
+  LEFT JOIN joined_deaths jd ON b.client_id = jd.patient_id AND jd.location_id = b.location_id AND jd.period_id = b.period_id
+  GROUP BY b.location_id, b.period_id
 
-under_5_deaths AS (
-  SELECT d.reported_by_parent AS location_id, p.period_id, COUNT(DISTINCT d.uuid) AS u5_deaths
-  FROM {{ ref('death_report') }} d
-  JOIN periods p ON d.date_of_death BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON d.reported_by_parent = l.location_id
-  WHERE d.patient_age_in_days < 1827
-  GROUP BY d.reported_by_parent, p.period_id
-),
+  UNION ALL
 
-under_5_muted AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS u5_muted
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.muted ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' AND clients.muted::DATE BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  WHERE clients.muted IS NOT NULL
-    AND clients.date_of_birth IS NOT NULL
-    AND AGE(p.end_date, clients.date_of_birth) < INTERVAL '5 years'
-  GROUP BY hh.chv_area_id, p.period_id
-),
+  SELECT b.location_id, b.period_id, 'population_male',
+         COUNT(DISTINCT CASE WHEN is_male THEN client_id END)
+         - COUNT(DISTINCT CASE WHEN is_male AND is_muted THEN client_id END)
+         - COUNT(DISTINCT jd.uuid) FILTER (WHERE jd.sex = 'male') 
+  FROM base b
+  LEFT JOIN joined_deaths jd ON b.client_id = jd.patient_id AND jd.location_id = b.location_id AND jd.period_id = b.period_id
+  GROUP BY b.location_id, b.period_id
 
--- Under 5 male
-male_under_5_raw AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS m_u5_registered
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.date_of_birth IS NOT NULL
-                 AND clients.reported <= p.end_date
-                 AND AGE(p.end_date, clients.date_of_birth) < INTERVAL '5 years'
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  WHERE clients.sex = 'male'
-  GROUP BY hh.chv_area_id, p.period_id
-),
+  UNION ALL
 
-male_under_5_deaths AS (
-  SELECT d.reported_by_parent AS location_id, p.period_id, COUNT(DISTINCT d.uuid) AS m_u5_deaths
-  FROM {{ ref('death_report') }} d
-  JOIN periods p ON d.date_of_death BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON d.reported_by_parent = l.location_id
-  JOIN {{ ref('patient_f_client') }} c ON d.patient_id = c.uuid
-  WHERE d.patient_age_in_days < 1827 and c.sex = 'male'
-  GROUP BY d.reported_by_parent, p.period_id
-),
+  SELECT b.location_id, b.period_id, 'population_female',
+         COUNT(DISTINCT CASE WHEN is_female THEN client_id END)
+         - COUNT(DISTINCT CASE WHEN is_female AND is_muted THEN client_id END)
+         - COUNT(DISTINCT jd.uuid) FILTER (WHERE jd.sex = 'female')
+  FROM base b
+  LEFT JOIN joined_deaths jd ON b.client_id = jd.patient_id AND jd.location_id = b.location_id AND jd.period_id = b.period_id
+  GROUP BY b.location_id, b.period_id
 
-male_under_5_muted AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS m_u5_muted
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.muted ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' AND clients.muted::DATE BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  WHERE clients.muted IS NOT NULL
-    AND clients.date_of_birth IS NOT NULL
-    AND AGE(p.end_date, clients.date_of_birth) < INTERVAL '5 years'
-    AND clients.sex = 'male'
-  GROUP BY hh.chv_area_id, p.period_id
-),
+  UNION ALL
 
--- Under 5 female
-female_under_5_raw AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS f_u5_registered
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.date_of_birth IS NOT NULL
-                 AND clients.reported <= p.end_date
-                 AND AGE(p.end_date, clients.date_of_birth) < INTERVAL '5 years'
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  WHERE clients.sex = 'female'
-  GROUP BY hh.chv_area_id, p.period_id
-),
+  SELECT b.location_id, b.period_id, 'under_5_population',
+         COUNT(DISTINCT CASE WHEN is_u5 THEN client_id END)
+         - COUNT(DISTINCT CASE WHEN is_u5 AND is_u5_muted THEN client_id END)
+         - COUNT(DISTINCT jd.uuid) FILTER (WHERE jd.patient_age_in_days < 1827)
+  FROM base b
+  LEFT JOIN joined_deaths jd ON b.client_id = jd.patient_id AND jd.location_id = b.location_id AND jd.period_id = b.period_id
+  GROUP BY b.location_id, b.period_id
 
-female_under_5_deaths AS (
-  SELECT d.reported_by_parent AS location_id, p.period_id, COUNT(DISTINCT d.uuid) AS f_u5_deaths
-  FROM {{ ref('death_report') }} d
-  JOIN periods p ON d.date_of_death BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON d.reported_by_parent = l.location_id
-  JOIN {{ ref('patient_f_client') }} c ON d.patient_id = c.uuid
-  WHERE d.patient_age_in_days < 1827 and c.sex = 'female'
-  GROUP BY d.reported_by_parent, p.period_id
-),
+  UNION ALL
 
-female_under_5_muted AS (
-  SELECT hh.chv_area_id AS location_id, p.period_id, COUNT(DISTINCT clients.uuid) AS f_u5_muted
-  FROM {{ ref('patient_f_client') }} clients
-  JOIN {{ ref('household') }} hh ON clients.household_id = hh.uuid
-  JOIN periods p ON clients.muted ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' AND clients.muted::DATE BETWEEN p.start_date AND p.end_date
-  JOIN valid_locations l ON hh.chv_area_id = l.location_id
-  WHERE clients.muted IS NOT NULL
-    AND clients.date_of_birth IS NOT NULL
-    AND AGE(p.end_date, clients.date_of_birth) < INTERVAL '5 years'
-    AND clients.sex = 'female'
-  GROUP BY hh.chv_area_id, p.period_id
-),
+  SELECT b.location_id, b.period_id, 'population_under_5_male',
+         COUNT(DISTINCT CASE WHEN is_u5 AND is_male THEN client_id END)
+         - COUNT(DISTINCT CASE WHEN is_u5 AND is_male AND is_u5_muted THEN client_id END)
+         - COUNT(DISTINCT jd.uuid) FILTER (WHERE jd.sex = 'male' AND jd.patient_age_in_days < 1827)
+  FROM base b
+  LEFT JOIN joined_deaths jd ON b.client_id = jd.patient_id AND jd.location_id = b.location_id AND jd.period_id = b.period_id
+  GROUP BY b.location_id, b.period_id
 
-population_combined AS (
-  SELECT r.location_id, r.period_id, 
-         r.pax_registered,
-         COALESCE(d.pax_deaths, 0) AS pax_deaths,
-         COALESCE(m.pax_muted, 0) AS pax_muted
-  FROM registrations r
-  LEFT JOIN deaths d ON r.location_id = d.location_id AND r.period_id = d.period_id
-  LEFT JOIN muted m ON r.location_id = m.location_id AND r.period_id = m.period_id
-),
+  UNION ALL
 
-under_5_combined AS (
-  SELECT u.location_id, u.period_id, 
-         u.u5_registered,
-         COALESCE(d.u5_deaths, 0) AS u5_deaths,
-         COALESCE(m.u5_muted, 0) AS u5_muted
-  FROM under_5_raw u
-  LEFT JOIN under_5_deaths d ON u.location_id = d.location_id AND u.period_id = d.period_id
-  LEFT JOIN under_5_muted m ON u.location_id = m.location_id AND u.period_id = m.period_id
-),
-
-male_under_5_combined AS (
-  SELECT m_u.location_id, m_u.period_id, 
-         m_u.m_u5_registered,
-         COALESCE(d.m_u5_deaths, 0) AS m_u5_deaths,
-         COALESCE(mm.m_u5_muted, 0) AS m_u5_muted
-  FROM male_under_5_raw m_u
-  LEFT JOIN male_under_5_deaths d ON m_u.location_id = d.location_id AND m_u.period_id = d.period_id
-  LEFT JOIN male_under_5_muted mm ON m_u.location_id = mm.location_id AND m_u.period_id = mm.period_id
-),
-
-female_under_5_combined AS (
-  SELECT f_u.location_id, f_u.period_id, 
-         f_u.f_u5_registered,
-         COALESCE(d.f_u5_deaths, 0) AS f_u5_deaths,
-         COALESCE(fm.f_u5_muted, 0) AS f_u5_muted
-  FROM female_under_5_raw f_u
-  LEFT JOIN female_under_5_deaths d ON f_u.location_id = d.location_id AND f_u.period_id = d.period_id
-  LEFT JOIN female_under_5_muted fm ON f_u.location_id = fm.location_id AND f_u.period_id = fm.period_id
+  SELECT b.location_id, b.period_id, 'population_under_5_female',
+         COUNT(DISTINCT CASE WHEN is_u5 AND is_female THEN client_id END)
+         - COUNT(DISTINCT CASE WHEN is_u5 AND is_female AND is_u5_muted THEN client_id END)
+         - COUNT(DISTINCT jd.uuid) FILTER (WHERE jd.sex = 'female' AND jd.patient_age_in_days < 1827)
+  FROM base b
+  LEFT JOIN joined_deaths jd ON b.client_id = jd.patient_id AND jd.location_id = b.location_id AND jd.period_id = b.period_id
+  GROUP BY b.location_id, b.period_id
 )
 
 SELECT
   location_id,
   period_id,
-  'population' AS metric_id,
-  pax_registered - pax_deaths - pax_muted AS value,
+  metric_id,
+  value,
+  CURRENT_DATE AS snapshot_date,
   CURRENT_TIMESTAMP AS last_updated
-FROM population_combined
-WHERE pax_registered - pax_deaths - pax_muted > 0
-
-UNION ALL
-
-SELECT
-  location_id,
-  period_id,
-  'under_5_population' AS metric_id,
-  u5_registered - u5_deaths - u5_muted AS value,
-  CURRENT_TIMESTAMP AS last_updated
-FROM under_5_combined
-WHERE u5_registered - u5_deaths - u5_muted > 0
-
-UNION ALL
-
-SELECT
-  location_id,
-  period_id,
-  'population_under_5_male' AS metric_id,
-  m_u5_registered - m_u5_deaths - m_u5_muted AS value,
-  CURRENT_TIMESTAMP AS last_updated
-FROM male_under_5_combined
-WHERE m_u5_registered - m_u5_deaths - m_u5_muted > 0
-
-UNION ALL
-
-SELECT
-  location_id,
-  period_id,
-  'population_under_5_female' AS metric_id,
-  f_u5_registered - f_u5_deaths - f_u5_muted AS value,
-  CURRENT_TIMESTAMP AS last_updated
-FROM female_under_5_combined
-WHERE f_u5_registered - f_u5_deaths - f_u5_muted > 0
+FROM aggregated
+WHERE value > 0

@@ -2,8 +2,8 @@
 -- Add logic to count screenings and referrals for diabetes and hypertension
 {{ config(
     materialized = 'incremental',
-    unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    unique_key = ['snapshot_date', 'location_id', 'period_id', 'metric_id'],
+    on_schema_change='append_new_columns'
 ) }}
 
 WITH filtered_data AS (
@@ -173,6 +173,7 @@ SELECT
     period_id,
     metric_id,
     value,
+    CURRENT_DATE AS snapshot_date,
     CURRENT_TIMESTAMP AS last_updated
 FROM with_periods
 WHERE value > 0

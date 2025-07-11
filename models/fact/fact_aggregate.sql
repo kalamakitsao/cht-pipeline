@@ -8,38 +8,67 @@
     ]
 ) }}
 
-SELECT * FROM {{ ref('population') }}
+{% set metric_models = [
+    'population',
+    'u5_conditions',
+    'sha_metrics',
+    'chps_enrolled',
+    'households_registered',
+    'under_1_immunised',
+    'people_served',
+    'referrals',
+    'deaths',
+    'pregnancy_metrics',
+    'households_visited',
+    'ncd_metrics',
+    'chps_with_households',
+    'community_events_participation',
+    'revised_active_chps'
+] %}
+
+WITH
+{% for model in metric_models %}
+  {% if not loop.first %},{% endif %}
+  {{ model }}_ranked AS (
+      SELECT *
+      FROM (
+        SELECT *,
+               ROW_NUMBER() OVER (
+                 PARTITION BY location_id, period_id, metric_id
+                 ORDER BY snapshot_date DESC NULLS LAST, last_updated DESC
+               ) AS rn
+        FROM {{ ref(model) }}
+      ) sub
+      WHERE rn = 1
+  )
+{% endfor %}
+
+SELECT * FROM population_ranked
 UNION ALL
-SELECT * FROM {{ ref('u5_conditions') }}
+SELECT * FROM u5_conditions_ranked
 UNION ALL
-SELECT * FROM {{ ref('sha_metrics') }}
+SELECT * FROM sha_metrics_ranked
 UNION ALL
-SELECT * FROM {{ ref('chps_enrolled') }}
+SELECT * FROM chps_enrolled_ranked
 UNION ALL
-SELECT * FROM {{ ref('households_registered') }}
+SELECT * FROM households_registered_ranked
 UNION ALL
-SELECT * FROM {{ ref('under_1_immunised') }}
+SELECT * FROM under_1_immunised_ranked
 UNION ALL
-SELECT * FROM {{ ref('people_served') }}
+SELECT * FROM people_served_ranked
 UNION ALL
-SELECT * FROM {{ ref('active_chps') }}
+SELECT * FROM referrals_ranked
 UNION ALL
-SELECT * FROM {{ ref('referrals') }}
+SELECT * FROM deaths_ranked
 UNION ALL
-SELECT * FROM {{ ref('deaths') }}
+SELECT * FROM pregnancy_metrics_ranked
 UNION ALL
-SELECT * FROM {{ ref('pregnancy_metrics') }}
+SELECT * FROM households_visited_ranked
 UNION ALL
-SELECT * FROM {{ ref('households_visited') }}
+SELECT * FROM ncd_metrics_ranked
 UNION ALL
-SELECT * FROM {{ ref('ncd_metrics') }}
+SELECT * FROM chps_with_households_ranked
 UNION ALL
-SELECT * FROM {{ ref('chps_with_households') }}
+SELECT * FROM community_events_participation_ranked
 UNION ALL
-SELECT * FROM {{ ref('community_events_participation') }}
-UNION ALL
-SELECT * FROM {{ ref('population_male') }}
-UNION ALL
-SELECT * FROM {{ ref('population_female') }}
-UNION ALL
-SELECT * FROM {{ ref('revised_active_chps') }}
+SELECT * FROM revised_active_chps_ranked
