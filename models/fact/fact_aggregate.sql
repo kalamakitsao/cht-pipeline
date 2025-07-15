@@ -43,3 +43,10 @@ UNION ALL
 SELECT * FROM {{ ref('population_female') }}
 UNION ALL
 SELECT * FROM {{ ref('revised_active_chps') }}
+UNION ALL
+SELECT * FROM {{ ref('actively_reporting_chps') }}
+UNION ALL
+SELECT * FROM {{ ref('fully_immunised_metrics') }}
+UNION ALL
+SELECT * FROM {{ ref('newborn_pnc_metrics') }}
+
