@@ -12,7 +12,7 @@
 
 SELECT
     uuid AS location_id,
-    name,
+    trim(name) AS name,
     CASE contact_type
         WHEN 'a_county' THEN 'county'
         WHEN 'b_sub_county' THEN 'sub county'
