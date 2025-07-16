@@ -99,8 +99,7 @@ FROM (
         ('screened_mental_health_male', 'Male Screened for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of male screened for Mental Health', 'count'),
         ('screened_mental_health_female', 'Female Screened for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of female screened for Mental Health', 'count'),
         ('referred_mental_health_male', 'Male Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of Male referred for Mental Health care', 'count'),
-        ('referred_mental_health_female', 'Female Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of Female referred for Mental Health care', 'count')
-)
+        ('referred_mental_health_female', 'Female Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of Female referred for Mental Health care', 'count'),
         -- Household & Population Registration
         ('households_registered', 'Households Registered', 'Households and Population Registration', 'Number of households registered in eCHIS', 'count'),
         ('population', 'Total Population', 'Households and Population Registration', 'Individuals registered in eCHIS', 'count'),
