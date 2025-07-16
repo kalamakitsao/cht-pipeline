@@ -2,48 +2,49 @@
     materialized = 'table',
     indexes = [
       {"columns": ["county", "sub_county", "community_unit", "period_id", "metric_id"], "unique": true},
-      {"columns": ["period_label"]},
+      {"columns": ["label"]},
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
       {"columns": ["last_updated"]}
     ]
 ) }}
 
+WITH location_hierarchy AS (
+    SELECT
+        chp_area_id,
+        community_unit,
+        sub_county,
+        county
+    FROM {{ ref('mv_location_hierarchy') }}
+)
+
 SELECT
     'community unit' AS level,
-    county_loc.name AS county,
-    sub.name AS sub_county,
-    chu.name AS community_unit,
-    NULL AS chp_area,
+    lh.county,
+    lh.sub_county,
+    lh.community_unit,
     dp.start_date AS period_start,
     dp.end_date AS period_end,
-    dp.label AS period_label,
+    dp.label,
     dm.group_name AS metric_group,
     dm.name AS metric,
     SUM(fa.value) AS value,
     NULL AS location_id,
-    fa.period_id,
+    dp.period_id,
     fa.metric_id,
     MAX(fa.last_updated) AS last_updated
 FROM {{ ref('fact_aggregate') }} fa
-JOIN {{ ref('dim_location') }} chp_area ON chp_area.location_id = fa.location_id
-LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp_area.parent_id
-LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
-LEFT JOIN {{ ref('dim_location') }} county_loc ON county_loc.location_id = sub.parent_id
+JOIN location_hierarchy lh ON lh.chp_area_id = fa.location_id
 JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
-WHERE chp_area.level = 'chp area'
-  AND chp_area.name !~ '^[0-9]+$'
-  AND county_loc.name IS NOT NULL
-  AND county_loc.level = 'county'
 GROUP BY
-    chu.name,
-    sub.name,
-    county_loc.name,
+    lh.community_unit,
+    lh.sub_county,
+    lh.county,
     dp.start_date,
     dp.end_date,
     dp.label,
+    dp.period_id,
     dm.group_name,
     dm.name,
-    fa.period_id,
     fa.metric_id

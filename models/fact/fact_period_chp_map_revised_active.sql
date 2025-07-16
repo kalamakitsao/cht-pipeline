@@ -1,50 +1,53 @@
--- models/fact/metrics/revised_active_chps.sql
-
 {{ config(
     materialized = 'incremental',
-    unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    on_schema_change='append_new_columns',
+    unique_key = ['period_id', 'location_id', 'metric_id', 'chp_id'],
+    tags = ['daily_refresh']
 ) }}
 
-WITH hh_visits AS (
-    SELECT location_id, period_id, SUM(value) AS hh_visited
-    FROM {{ ref('households_visited') }}
+WITH periods AS (
+  SELECT period_id, start_date, end_date FROM {{ ref('dim_period') }}
+),
+
+hh_visits AS (
+    SELECT period_id, location_id, SUM(value) AS hh_visited
+    FROM {{ ref('agg_households_visited_metrics_rolling') }}
     WHERE metric_id = 'hh_visited'
     GROUP BY location_id, period_id
 ),
 
 referrals AS (
-    SELECT location_id, period_id, SUM(value) AS total_referrals
-    FROM {{ ref('referrals') }}
+    SELECT period_id, location_id, SUM(value) AS total_referrals
+    FROM {{ ref('agg_referral_metrics_rolling') }}
     WHERE metric_id = 'total_referrals'
     GROUP BY location_id, period_id
 ),
 
 u5_assessed AS (
-    SELECT location_id, period_id, SUM(value) AS u5
-    FROM {{ ref('u5_conditions') }}
+    SELECT period_id, location_id, SUM(value) AS u5
+    FROM {{ ref('agg_u5_metrics_rolling') }}
     WHERE metric_id = 'u5_assessed'
     GROUP BY location_id, period_id
 ),
 
 over_5_assessed AS (
-    SELECT location_id, period_id, SUM(value) AS over5
-    FROM {{ ref('ncd_metrics') }}
+    SELECT period_id, location_id, SUM(value) AS over5
+    FROM {{ ref('agg_over_five_metrics_rolling') }}
     WHERE metric_id = 'over_5_assessments'
     GROUP BY location_id, period_id
 ),
 
 community_events AS (
-    SELECT location_id, period_id,
+    SELECT period_id, location_id,
            MAX(CASE WHEN metric_id = 'monthly_cu_meetings' THEN value ELSE 0 END) AS cu_meetings,
            MAX(CASE WHEN metric_id = 'other_community_events' THEN value ELSE 0 END) AS other_events
-    FROM {{ ref('community_events_participation') }}
+    FROM {{ ref('agg_community_events_metrics_rolling') }}
     GROUP BY location_id, period_id
 ),
 
 households_registered AS (
-    SELECT location_id, period_id, SUM(value) AS households_registered
-    FROM {{ ref('households_registered') }}
+    SELECT period_id, location_id, SUM(value) AS households_registered
+    FROM {{ ref('agg_households_registered_and_chp_counts_rolling') }}
     WHERE metric_id = 'households_registered'
     GROUP BY location_id, period_id
 ),
@@ -53,7 +56,9 @@ scored AS (
     SELECT
         v.location_id,
         v.period_id,
-        -- Coverage based on households_registered
+        -- Use location_id as chp_id here for now (or replace with real CHPs table)
+        v.location_id AS chp_id,
+
         CASE
             WHEN v.hh_visited IS NULL OR hr.households_registered IS NULL OR hr.households_registered = 0 THEN 0
             ELSE
@@ -84,10 +89,10 @@ scored_with_total AS (
 )
 
 SELECT
-    location_id,
     period_id,
+    location_id,
     'revised_active_chps' AS metric_id,
-    1 AS value,
-    CURRENT_TIMESTAMP AS last_updated
+    chp_id,
+    1 AS value
 FROM scored_with_total
 WHERE total_score >= 80
