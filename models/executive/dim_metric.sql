@@ -28,6 +28,7 @@ FROM (
         ('referred_for_pneumonia', 'Referred for Pneumonia', 'Child Health (<5 years)', 'Children referred for pneumonia treatment', 'count'),
         ('referred_for_malnutrition', 'Referred for Malnutrition', 'Child Health (<5 years)', 'Children referred for malnutrition', 'count'),
         ('referred_for_dirrhoea', 'Referred for Diarrhoea', 'Child Health (<5 years)', 'Children referred for diarrhoea treatment', 'count'),
+        ('u5_referred', 'Under 5 Referred', 'Child Health (<5 years)', 'Children Referred for Further Assessment', 'count'),
         ('needs_deworming_follow_up_male', 'Male Children Needing Deworming', 'Child Health (<5 years)', 'Male children needing follow-up deworming', 'count'),
         ('needs_deworming_follow_up_female', 'Female Children Needing Deworming', 'Child Health (<5 years)', 'Female children needing follow-up deworming', 'count'),
 
@@ -37,7 +38,7 @@ FROM (
         ('teen_pregnancies', 'Teen Pregnancies (10-19)', 'Maternal Health Services', 'Number of pregnant women aged 10-19 within the period', 'count'),
         ('new_teen_pregnancies', 'New Teen Pregnancies (10-19)', 'Maternal Health Services', 'Newly identified pregnancies among women aged 10–19', 'count'),
         ('pregnant_women_visited', 'Pregnant Women Visited', 'Maternal Health Services', 'Number of pregnant women visited during the period', 'count'),
-        ('pregnant_women_referred_any_reason', 'Pregnant Women Referred (Any Reason)', 'Maternal Health Services', 'Pregnant women referred during the period for any reason', 'count'),
+        ('pregnant_women_referred', 'Pregnant Women Referred (Any Reason)', 'Maternal Health Services', 'Pregnant women referred during the period for any reason', 'count'),
         ('pregnant_women_referred_missed_anc', 'Pregnant Women Referred for Missed ANC', 'Maternal Health Services', 'Pregnant women referred due to missed ANC visit', 'count'),
         ('new_pregnant_women_referred_anc', 'New Pregnant Women Referred for ANC', 'Maternal Health Services', 'Newly identified pregnant women referred for ANC', 'count'),
         ('referred_for_delivery', 'Pregnant Women Referred for Delivery', 'Maternal Health Services', 'Women referred for facility delivery', 'count'),
@@ -76,9 +77,11 @@ FROM (
         ('referred_growth_monitoring_male', 'Boys Referred for Growth Monitoring', 'Child Health (<5 years)', 'Male children referred for growth monitoring', 'count'),
         ('referred_growth_monitoring_female', 'Girls Referred for Growth Monitoring', 'Child Health (<5 years)', 'Female children referred for growth monitoring', 'count'),
 
-        -- NCD Metrics
+        -- Over 5 and NCD Metrics
         ('over_5_assessments', 'Over 5 Assessments', 'NCDs (Chronic Illnesses)', 'Assessments done for over 5 population', 'count'),
         ('over_5_referred', 'Over 5 Referred', 'NCDs (Chronic Illnesses)', 'Referrals for population over 5', 'count'),
+        ('over_5_referred_male', 'Male Over 5 Referrals', 'NCDs (Chronic Illnesses)', 'Over Male 5s assessed and referred', 'count'),
+        ('over_5_referred_female', 'Female Over 5 Referrals', 'NCDs (Chronic Illnesses)', 'Over 5s Female assessed and referred', 'count'),
         ('screened_diabetes', 'Screened for Diabetes', 'NCDs (Chronic Illnesses)', 'Individuals screened for diabetes', 'count'),
         ('screened_diabetes_male', 'Male Screened for Diabetes', 'NCDs (Chronic Illnesses)', 'Males screened for diabetes', 'count'),
         ('screened_diabetes_female', 'Female Screened for Diabetes', 'NCDs (Chronic Illnesses)', 'Females screened for diabetes', 'count'),
@@ -87,12 +90,24 @@ FROM (
         ('referred_hypertension', 'Referred for Hypertension', 'NCDs (Chronic Illnesses)', 'Individuals referred for hypertension care', 'count'),
         ('screened_mental_health', 'Screened for Mental Health', 'NCDs (Chronic Illnesses)', 'Screened for mental health issues', 'count'),
         ('referred_mental_health', 'Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Referrals for mental health support', 'count'),
-
+        ('referred_diabetes_male', 'Male Referred for Diabetes', 'NCDs (Chronic Illnesses)', 'Number of male referred for diabetes care', 'count'),
+        ('referred_diabetes_female', 'Female Referred for Diabetes', 'NCDs (Chronic Illnesses)', 'Number of female referred for diabetes care', 'count'),
+        ('screened_hypertension_male', 'Male Screened for Hypertension', 'NCDs (Chronic Illnesses)', 'Number of male screened for hypertension', 'count'),
+        ('screened_hypertension_female', 'Female Screened for Hypertension', 'NCDs (Chronic Illnesses)', 'Number of female screened for hypertension', 'count'),
+        ('referred_hypertension_male', 'Male Referred for Hypertension', 'NCDs (Chronic Illnesses)', 'Number of Male referred for hypertension care', 'count'),
+        ('referred_hypertension_female', 'Female Referred for Hypertension', 'NCDs (Chronic Illnesses)', 'Number of Female referred for hypertension care', 'count'),
+        ('screened_mental_health_male', 'Male Screened for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of male screened for Mental Health', 'count'),
+        ('screened_mental_health_female', 'Female Screened for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of female screened for Mental Health', 'count'),
+        ('referred_mental_health_male', 'Male Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of Male referred for Mental Health care', 'count'),
+        ('referred_mental_health_female', 'Female Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of Female referred for Mental Health care', 'count'),
         -- Household & Population Registration
         ('households_registered', 'Households Registered', 'Households and Population Registration', 'Number of households registered in eCHIS', 'count'),
         ('population', 'Total Population', 'Households and Population Registration', 'Individuals registered in eCHIS', 'count'),
         ('population_male', 'Male Population', 'Households and Population Registration', 'Male individuals registered in eCHIS', 'count'),
         ('population_female', 'Female Population', 'Households and Population Registration', 'Female individuals registered in eCHIS', 'count'),
+        ('under_5_population', 'Under 5 Population', 'Child Health (<5 years)', 'Total number of individuals registered in eCHIS, currently under 5 years', 'count'),
+        ('population_under_5_male', 'Population Under 5 Male', 'Child Health (<5 years)', 'Total number of Male registered in eCHIS, currently under 5 years', 'count'),
+        ('population_under_5_female', 'Population Under 5 Female', 'Child Health (<5 years)', 'Total number of Female registered in eCHIS, currently under 5 years', 'count'),
         ('exp_population', 'Expected Population Registration', 'Households and Population Registration', 'Expected vs registered population', 'count'),
         ('perc_hh_registered', 'Household Registration Rate', 'Households and Population Registration', 'Proportion of HHs registered per county', 'count'),
         ('perc_hh_with_insurance', 'HHs with Insurance', 'Households and Population Registration', 'Proportion of households with active insurance', 'count'),
@@ -112,6 +127,13 @@ FROM (
         ('maternal_deaths', 'Maternal Deaths', 'Birth and Death Reporting', 'Deaths of women during pregnancy or within 42 days post-delivery', 'count'),
         ('neonatal_deaths', 'Neonatal Deaths', 'Birth and Death Reporting', 'Deaths of children within 28 days of birth', 'count'),
         ('child_deaths', 'Child Deaths (29d-5y)', 'Birth and Death Reporting', 'Deaths of children aged 29 days to 5 years', 'count'),
-        ('total_deaths', 'Total Deaths Reported', 'Birth and Death Reporting', 'Total deaths reported by CHPs', 'count')
+        ('total_deaths', 'Total Deaths Reported', 'Birth and Death Reporting', 'Total deaths reported by CHPs', 'count'),
+
+        -- SHA
+        ('households_with_active_insurance', 'Households With Active Insurance Cover', 'Households and Population Registration', 'Number of households that have an active insurance cover', 'count'),
+        ('households_registered_on_sha', 'Households Registered on SHA', 'Households and Population Registration', 'Number of households registered with NHIF, SHIF, or SHA schemes', 'count'),
+        ('households_assessed_sha', 'Households Assessed for SHA Registration', 'Households and Population Registration', 'Number of households assessed for SHA registration (true or false)', 'count'),
+        ('households_with_sha', 'Households Registered for SHA', 'Households and Population Registration', 'Number of households with at least one member confirmed as registered to SHA', 'count')
+
 
 ) AS t(metric_id, name, group_name, description, unit)

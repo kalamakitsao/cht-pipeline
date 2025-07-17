@@ -18,8 +18,6 @@ SELECT * FROM {{ ref('chps_enrolled') }}
 UNION ALL
 SELECT * FROM {{ ref('households_registered') }}
 UNION ALL
-SELECT * FROM {{ ref('under_1_immunised') }}
-UNION ALL
 SELECT * FROM {{ ref('people_served') }}
 UNION ALL
 SELECT * FROM {{ ref('active_chps') }}
@@ -45,4 +43,5 @@ UNION ALL
 SELECT * FROM {{ ref('fully_immunised_metrics') }}
 UNION ALL
 SELECT * FROM {{ ref('newborn_pnc_metrics') }}
-
+UNION ALL
+SELECT * FROM {{ ref('actively_reporting_chps') }}
