@@ -117,6 +117,18 @@ metrics_unpivoted AS (
 
     UNION ALL
 
+     SELECT cha_id, report_date, 'u5_referred_male', COUNT(DISTINCT CASE WHEN has_been_referred  AND sex = 'male' THEN patient_id END)
+    FROM base
+    GROUP BY cha_id, report_date
+
+    UNION ALL
+
+     SELECT cha_id, report_date, 'u5_referred_female', COUNT(DISTINCT CASE WHEN has_been_referred  AND sex = 'female' THEN patient_id END)
+    FROM base
+    GROUP BY cha_id, report_date
+
+    UNION ALL
+
     SELECT cha_id, report_date, 'u5_treated', COUNT(DISTINCT CASE WHEN gave_ors OR gave_amox OR gave_al OR gave_zinc THEN patient_id END)
     FROM base
     GROUP BY cha_id, report_date

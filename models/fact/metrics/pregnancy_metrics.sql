@@ -108,6 +108,22 @@ new_pregnant_women_referred_anc AS (
     GROUP BY b.cha_id, p.period_id
 ),
 
+new_teen_pregnant_women_referred_anc AS (
+    SELECT
+        b.cha_id AS location_id,
+        p.period_id,
+        'new_teen_pregnant_women_referred_anc' AS metric_id,
+        COUNT(DISTINCT b.patient_id) AS value,
+        CURRENT_TIMESTAMP AS last_updated
+    FROM base_phv b
+    JOIN period_dates p ON b.reported BETWEEN p.start_date AND p.end_date
+    WHERE b.has_been_referred = TRUE 
+      AND b.is_new_pregnancy = TRUE 
+      AND b.has_started_anc = FALSE
+      AND b.patient_age_in_years BETWEEN 10 AND 19
+    GROUP BY b.cha_id, p.period_id
+),
+
 pregnant_women_referred_anc AS (
     SELECT
         b.cha_id AS location_id,

@@ -29,6 +29,8 @@ FROM (
         ('referred_for_malnutrition', 'Referred for Malnutrition', 'Child Health (<5 years)', 'Children referred for malnutrition', 'count'),
         ('referred_for_dirrhoea', 'Referred for Diarrhoea', 'Child Health (<5 years)', 'Children referred for diarrhoea treatment', 'count'),
         ('u5_referred', 'Under 5 Referred', 'Child Health (<5 years)', 'Children Referred for Further Assessment', 'count'),
+        ('u5_referred_male', 'Under 5 Referred Male', 'Male Child Health (<5 years)', 'Children Referred for Further Assessment', 'count'),
+        ('u5_referred_female', 'Under 5 Referred Female', 'Female Child Health (<5 years)', 'Children Referred for Further Assessment', 'count'),
         ('needs_deworming_follow_up_male', 'Male Children Needing Deworming', 'Child Health (<5 years)', 'Male children needing follow-up deworming', 'count'),
         ('needs_deworming_follow_up_female', 'Female Children Needing Deworming', 'Child Health (<5 years)', 'Female children needing follow-up deworming', 'count'),
 
@@ -39,8 +41,10 @@ FROM (
         ('new_teen_pregnancies', 'New Teen Pregnancies (10-19)', 'Maternal Health Services', 'Newly identified pregnancies among women aged 10–19', 'count'),
         ('pregnant_women_visited', 'Pregnant Women Visited', 'Maternal Health Services', 'Number of pregnant women visited during the period', 'count'),
         ('pregnant_women_referred', 'Pregnant Women Referred (Any Reason)', 'Maternal Health Services', 'Pregnant women referred during the period for any reason', 'count'),
-        ('pregnant_women_referred_missed_anc', 'Pregnant Women Referred for Missed ANC', 'Maternal Health Services', 'Pregnant women referred due to missed ANC visit', 'count'),
+        ('pregnant_women_referred_anc', 'Pregnant Women Referred for Missed ANC', 'Maternal Health Services', 'Pregnant women referred due to missed ANC visit', 'count'),
         ('new_pregnant_women_referred_anc', 'New Pregnant Women Referred for ANC', 'Maternal Health Services', 'Newly identified pregnant women referred for ANC', 'count'),
+        ('new_teen_pregnant_women_referred_anc', 'New Teen Pregnant Women Referred for ANC', 'Maternal Health Services', 'Newly identified teen pregnant women referred for ANC', 'count'),
+
         ('referred_for_delivery', 'Pregnant Women Referred for Delivery', 'Maternal Health Services', 'Women referred for facility delivery', 'count'),
         ('skilled_birth_attendance', 'Facility Based Deliveries', 'Maternal Health Services', 'Deliveries conducted by skilled providers at health facility', 'count'),
         ('first_trimester_pregnancies', 'First Trimester Pregnancies', 'Maternal Health Services', 'New pregnancies with gestational age under 12 weeks', 'count'),
@@ -56,12 +60,12 @@ FROM (
 
         -- Immunization
         ('under_1_immunised', 'Under 1 Year Fully Immunised', 'Child Health (<5 years)', 'Children under 1 year who are fully immunised', 'count'),
-        ('under_1_immunised_male', 'Male Under 1 Year Fully Immunised', 'Child Health (<5 years)', 'Male children under 1 year fully immunised', 'count'),
-        ('under_1_immunised_female', 'Female Under 1 Year Fully Immunised', 'Child Health (<5 years)', 'Female children under 1 year fully immunised', 'count'),
+        ('fully_immunized_male', 'Male Under 1 Year Fully Immunised', 'Child Health (<5 years)', 'Male children under 1 year fully immunised', 'count'),
+        ('fully_immunized_female', 'Female Under 1 Year Fully Immunised', 'Child Health (<5 years)', 'Female children under 1 year fully immunised', 'count'),
         ('children_turning_one', 'Children Turning One', 'Child Health (<5 years)', 'Children turning 1 year during reporting period', 'count'),
         ('male_turning_one', 'Male Children Turning One', 'Child Health (<5 years)', 'Male children turning 1 year during period', 'count'),
         ('female_turning_one', 'Female Children Turning One', 'Child Health (<5 years)', 'Female children turning 1 year during period', 'count'),
-        ('referred_immunization', 'Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Children referred for defaulting on their immunization schedule', 'count'),
+        ('referred_for_immunization', 'Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Children referred for defaulting on their immunization schedule', 'count'),
         ('referred_immunization_male', 'Boys Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Male children referred for defaulting on immunization schedule', 'count'),
         ('referred_immunization_female', 'Girls Referred for Immunization Defaulting', 'Child Health (<5 years)', 'Female children referred for defaulting on immunization schedule', 'count'),
         ('referred_missed_vaccine', 'Referred for Missed Vaccine', 'Child Health (<5 years)', 'Children referred for missed vaccinations', 'count'),
