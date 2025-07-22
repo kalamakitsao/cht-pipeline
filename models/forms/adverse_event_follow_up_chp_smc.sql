@@ -4,14 +4,13 @@
 {%- set age_indexes = patient_age_indexes() -%}
 
 {%- set form_indexes = [
-  {'columns': ['adverse_event.facility_attend']},
-  {'columns': ['adverse_event.patient_available']},
-  {'columns': ['group_summary.r_followup_outcome']}
+  {'columns': ['facility_attend']},
+  {'columns': ['patient_available']}
 ] -%}
 
 {% set custom_fields %}
   data_record.patient_id AS patient_id,
-  data_record.contact.parent.parent._id AS reported_by_parent_parent,
+  data_record.grandparent_uuid AS reported_by_parent_parent,
 
   {{ patient_age_columns() }},
 
