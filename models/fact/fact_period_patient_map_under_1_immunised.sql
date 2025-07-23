@@ -18,7 +18,6 @@ eligible_immunized AS (
   WHERE f.is_referred_immunization IS FALSE
     AND f.patient_age_in_months <= 12
     AND f.patient_id IS NOT NULL
-    AND f.reported_by_parent IN (SELECT location_id FROM {{ ref('dim_location') }})
 )
 
 SELECT

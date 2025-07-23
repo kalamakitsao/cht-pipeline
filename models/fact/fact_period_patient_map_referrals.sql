@@ -17,7 +17,6 @@ combined_referrals AS (
     FROM {{ ref('u5_assessment') }}
     WHERE has_been_referred IS TRUE
       AND patient_id IS NOT NULL
-      AND reported_by_parent IN (SELECT location_id FROM {{ ref('dim_location') }})
 
     UNION ALL
 
@@ -28,7 +27,6 @@ combined_referrals AS (
     FROM {{ ref('over_five_assessment') }}
     WHERE has_been_referred IS TRUE
       AND patient_id IS NOT NULL
-      AND reported_by_parent IN (SELECT location_id FROM {{ ref('dim_location') }})
 )
 
 SELECT

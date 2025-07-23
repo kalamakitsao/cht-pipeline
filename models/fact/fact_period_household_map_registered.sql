@@ -16,7 +16,6 @@ base_households AS (
     hh.chv_area_id AS location_id,
     DATE(hh.reported) AS report_date
   FROM {{ ref('household') }} hh
-  WHERE hh.chv_area_id IN (SELECT location_id FROM {{ ref('dim_location') }})
 )
 
 SELECT

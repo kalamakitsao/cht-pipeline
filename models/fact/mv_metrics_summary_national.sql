@@ -23,7 +23,7 @@ SELECT
   p.period_id,
   f.metric_id,
   CURRENT_TIMESTAMP AS last_updated
-FROM {{ ref('fact_aggregate') }} f
+FROM {{ ref('fact_metrics_rolling') }} f
 JOIN {{ ref('dim_period') }} p ON f.period_id = p.period_id
 JOIN {{ ref('dim_metric') }} m ON f.metric_id = m.metric_id
 GROUP BY

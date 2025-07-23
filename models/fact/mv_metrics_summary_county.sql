@@ -29,7 +29,7 @@ SELECT
     dp.period_id,
     fa.metric_id,
     MAX(fa.last_updated) AS last_updated
-FROM {{ ref('fact_aggregate') }} fa
+FROM {{ ref('fact_metrics_rolling') }} fa
 JOIN location_hierarchy lh ON lh.chp_area_id = fa.location_id
 JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id

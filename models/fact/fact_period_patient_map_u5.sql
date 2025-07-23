@@ -57,7 +57,12 @@ metrics AS (
       CASE WHEN b.referred_for_development_milestones THEN 'referred_for_development_milestones' END,
       CASE WHEN b.referred_for_development_milestones AND b.sex = 'male' THEN 'male_referred_for_development_milestones' END,
       CASE WHEN b.referred_for_development_milestones AND b.sex = 'female' THEN 'female_referred_for_development_milestones' END,
-      CASE WHEN b.has_been_referred THEN 'u5_referred' END
+      CASE WHEN b.has_been_referred THEN 'u5_referred' END,
+      CASE WHEN b.gave_ors OR b.gave_amox OR b.gave_al OR b.gave_zinc THEN 'u5_treated' END,
+      CASE WHEN b.gave_al THEN 'u5_treated_malaria' END,
+      CASE WHEN b.gave_ors OR b.gave_zinc THEN 'u5_treated_diarrhoea' END,
+      CASE WHEN b.gave_amox THEN 'u5_treated_pneumonia' END,
+      CASE WHEN b.rdt_result <> 'not_done' OR b.rdt_result IS NOT NULL THEN 'u5_tested_malaria' END
     ]) AS metric_id
   FROM base b
 )

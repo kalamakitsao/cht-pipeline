@@ -11,8 +11,7 @@ WITH patient_events AS (
         DATE(dr.reported) AS report_date,
         dr.patient_id
     FROM {{ ref('data_record') }} dr
-    WHERE dr.parent_uuid IN (SELECT location_id FROM {{ ref('dim_location') }})
-      AND dr.patient_id IS NOT NULL
+    WHERE dr.patient_id IS NOT NULL
 ),
 
 with_periods AS (

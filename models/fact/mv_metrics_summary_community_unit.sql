@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      {"columns": ["sub_county", "period_id", "metric_id"], "unique": true},
+      {"columns": ["county", "sub_county", "community_unit", "period_id", "metric_id"], "unique": true},
       {"columns": ["label"]},
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
@@ -12,15 +12,17 @@
 WITH location_hierarchy AS (
     SELECT
         chp_area_id,
+        community_unit,
         sub_county,
         county
     FROM {{ ref('mv_location_hierarchy') }}
 )
 
 SELECT
-    'sub county' AS level,
-    lh.sub_county,
+    'community unit' AS level,
     lh.county,
+    lh.sub_county,
+    lh.community_unit,
     dp.start_date AS period_start,
     dp.end_date AS period_end,
     dp.label,
@@ -31,11 +33,12 @@ SELECT
     dp.period_id,
     fa.metric_id,
     MAX(fa.last_updated) AS last_updated
-FROM {{ ref('fact_aggregate') }} fa
+FROM {{ ref('fact_metrics_rolling') }} fa
 JOIN location_hierarchy lh ON lh.chp_area_id = fa.location_id
 JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
 GROUP BY
+    lh.community_unit,
     lh.sub_county,
     lh.county,
     dp.start_date,

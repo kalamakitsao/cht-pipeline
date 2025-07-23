@@ -30,7 +30,7 @@ aggregates AS (
         fa.metric_id,
         fa.value,
         fa.last_updated
-    FROM {{ ref('fact_aggregate') }} fa
+    FROM {{ ref('fact_metrics_rolling') }} fa
 ),
 
 joined AS (

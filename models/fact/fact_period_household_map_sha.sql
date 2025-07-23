@@ -17,7 +17,6 @@ latest_sha_registration AS (
     sr.has_sha_registration
   FROM {{ ref('sha_registration') }} sr
   INNER JOIN {{ ref('patient_f_client') }} c ON sr.member_uuid = c.uuid
-  WHERE sr.reported_by_parent IN (SELECT location_id FROM {{ ref('dim_location') }})
   ORDER BY c.household_id, sr.reported DESC
 ),
 
