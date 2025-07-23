@@ -40,9 +40,6 @@ WITH periods AS (
     UNION ALL
     SELECT 'Year to Date (YTD)', 'yearly',
            DATE_TRUNC('year', CURRENT_DATE), CURRENT_DATE
-    UNION ALL
-    -- New: All Time
-    SELECT 'All Time', 'all_time', DATE '2020-01-01', CURRENT_DATE
 )
 
 SELECT
