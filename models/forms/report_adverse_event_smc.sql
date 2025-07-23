@@ -4,31 +4,18 @@
 {%- set age_indexes = patient_age_indexes() -%}
 
 {%- set form_indexes = [
-  {'columns': ['adverse_event_group.adverse_event']},
-  {'columns': ['mild_events']},
-  {'columns': ['severe_events']},
   {'columns': ['needs_referral']}
 ] -%}
 
 {% set custom_fields %}
   data_record.patient_id AS patient_id,
-  data_record.contact.parent.parent._id AS reported_by_parent_parent,
-
-  {{ patient_age_columns() }},
+  data_record.grandparent_uuid AS reported_by_parent_parent,
 
   -- Patient and contact info
-  NULLIF(couchdb.doc -> 'fields' ->> 'patient_uuid', '') AS patient_uuid,
-  NULLIF(couchdb.doc -> 'fields' ->> 'patient_name', '') AS patient_name,
-  NULLIF(couchdb.doc -> 'fields' ->> 'patient_phone', '') AS patient_phone,
-  NULLIF(couchdb.doc -> 'fields' ->> 'patient_village', '') AS patient_village,
   NULLIF(couchdb.doc -> 'fields' ->> 'patient_sex', '') AS patient_sex,
   NULLIF(couchdb.doc -> 'fields' ->> 'patient_date_of_birth', '') AS patient_date_of_birth,
-  NULLIF(couchdb.doc -> 'fields' ->> 'patient_age_years', '') AS patient_age_in_years,
-  NULLIF(couchdb.doc -> 'fields' ->> 'patient_age_in_months', '') AS patient_age_in_months,
-
-  -- CHV info
-  NULLIF(couchdb.doc -> 'fields' ->> 'chv_name', '') AS chv_name,
-  NULLIF(couchdb.doc -> 'fields' ->> 'chv_phone', '') AS chv_phone,
+  
+  {{ patient_age_columns() }},
 
   -- Adverse event flags
   NULLIF(couchdb.doc -> 'fields' ->> 'mild_events', '') AS mild_events,

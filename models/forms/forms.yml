@@ -282,4 +282,38 @@ models:
         tests:
           - not_null
       - name: saved_timestamp
+  - name: adverse_event_follow_up_chp_smc
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  - name: report_adverse_event_smc
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  - name: campaign_service_smc
+    columns:
+      - name: uuid
+        data_type: string
+        constraints:
+          - type: unique
+          - type: foreign_key
+            expression: "{{ env_var('POSTGRES_SCHEMA') }}.data_record (uuid) ON DELETE CASCADE"
+        tests:
+          - not_null
+      - name: saved_timestamp
+  
 
