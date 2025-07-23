@@ -23,9 +23,9 @@
     'agg_households_visited_metrics_rolling',
     'agg_over_five_metrics_rolling',
     'agg_community_events_metrics_rolling',
-    'agg_revised_active_chps_metrics_rolling'
-    'agg_newborn_metrics_rolling'
-    'agg_fully_immunised_metrics_rolling'
+    'agg_revised_active_chps_metrics_rolling',
+    'agg_newborn_metrics_rolling',
+    'agg_fully_immunised_metrics_rolling',
     'agg_chp_reporting_compliance_metrics_rolling'
 ] %}
 
