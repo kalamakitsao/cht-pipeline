@@ -37,7 +37,6 @@ scored AS (
     FROM hh_visits v
     LEFT JOIN households_registered hr ON v.location_id = hr.location_id AND v.period_id = hr.period_id
 )
-)
 
 SELECT
     location_id,
