@@ -18,10 +18,9 @@ SELECT
   p.label AS period_label,
   m.group_name AS metric_group,
   m.name AS metric,
-  case when metric_id = 'chps_enrolled'
+  case when f.metric_id = 'chps_enrolled'
       then 107831
-      else SUM(fa.value) END AS value,
-  SUM(f.value) AS value,
+      else SUM(f.value) END AS value,
   f.period_id,
   f.metric_id,
   CURRENT_TIMESTAMP AS last_updated

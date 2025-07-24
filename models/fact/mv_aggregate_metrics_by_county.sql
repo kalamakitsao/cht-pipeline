@@ -20,10 +20,9 @@ SELECT
     dp.label AS period_label,
     dm.group_name AS metric_group,
     dm.name AS metric,
-    case when metric_id = 'chps_enrolled'
+    case when fa.metric_id = 'chps_enrolled'
       then chp_proj.expected_chps
       else SUM(fa.value) END AS value,
-      SUM(fa.value) AS value,
     NULL AS location_id,
     fa.period_id,
     fa.metric_id,
@@ -40,10 +39,6 @@ WHERE chp_area.level = 'chp area'
   AND chp_area.name !~ '^[0-9]+$'
   AND county_loc.name IS NOT NULL
   AND county_loc.level = 'county'
-WHERE chp_area.level = 'chp area'
-  AND chp_area.name !~ '^[0-9]+$'
-  AND county_loc.name IS NOT NULL
-  AND county_loc.level = 'county'
 GROUP BY
     county_loc.name,
     dp.start_date,
@@ -52,4 +47,5 @@ GROUP BY
     dm.group_name,
     dm.name,
     fa.period_id,
-    fa.metric_id
+    fa.metric_id,
+    chp_proj.expected_chps
