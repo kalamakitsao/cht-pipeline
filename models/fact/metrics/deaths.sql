@@ -12,8 +12,10 @@ WITH death_data AS (
         dr.reported::DATE AS reported_date,
         dr.patient_id,
         dr.death_type,
-        dr.patient_age_in_days
+        dr.patient_age_in_days,
+        p.sex
     FROM {{ ref('death_report') }} dr
+    join {{ ref('patient_f_client') }} p on dr.patient_id = p.uuid
     WHERE dr.reported_by_parent IN (SELECT location_id FROM {{ ref('dim_location') }})
 ),
 
@@ -23,7 +25,8 @@ deaths_with_period AS (
         p.period_id,
         d.death_type,
         d.patient_age_in_days,
-        d.patient_id
+        d.patient_id,
+        d.sex
     FROM death_data d
     JOIN {{ ref('dim_period') }} p
       ON d.reported_date BETWEEN p.start_date AND p.end_date
@@ -58,7 +61,49 @@ aggregated AS (
     FROM deaths_with_period
     GROUP BY location_id, period_id
 
+     UNION ALL
+
+    SELECT
+        location_id,
+        period_id,
+        'child_deaths_male' AS metric_id,
+        COUNT(*) FILTER (WHERE patient_age_in_days BETWEEN 29 AND 1827 and sex = 'male')
+    FROM deaths_with_period
+    GROUP BY location_id, period_id
+
+     UNION ALL
+
+    SELECT
+        location_id,
+        period_id,
+        'child_deaths_female' AS metric_id,
+        COUNT(*) FILTER (WHERE patient_age_in_days BETWEEN 29 AND 1827 and sex = 'female')
+    FROM deaths_with_period
+    GROUP BY location_id, period_id
+
     UNION ALL
+
+        SELECT
+        location_id,
+        period_id,
+        'over_5_deaths_male' AS metric_id,
+        COUNT(*) FILTER (WHERE patient_age_in_days > 1827 OR death_type != 'maternal death' and sex = 'male')
+    FROM deaths_with_period
+    GROUP BY location_id, period_id
+
+    UNION ALL
+
+        SELECT
+        location_id,
+        period_id,
+        'over_5_deaths_female' AS metric_id,
+        COUNT(*) FILTER (WHERE patient_age_in_days > 1827 OR death_type != 'maternal death' and sex = 'female')
+    FROM deaths_with_period
+    GROUP BY location_id, period_id
+
+
+    UNION ALL
+
 
     SELECT
         location_id,

@@ -39,10 +39,10 @@ WITH periods AS (
            DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '1 day', 'last_quarter' AS period_id_name
     UNION ALL
     SELECT 'Year to Date (YTD)', 'yearly',
-           DATE_TRUNC('year', CURRENT_DATE), CURRENT_DATE
+           DATE_TRUNC('year', CURRENT_DATE), CURRENT_DATE, 'ytd' AS period_id_name
     UNION ALL
     -- New: All Time
-    SELECT 'All Time', 'all_time', DATE '2020-01-01', CURRENT_DATE
+    SELECT 'All Time', 'all_time', DATE '2020-01-01', CURRENT_DATE, 'all_time' AS period_id_name
 )
 
 SELECT
