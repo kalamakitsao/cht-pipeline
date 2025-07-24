@@ -20,7 +20,10 @@ SELECT
     dp.label AS period_label,
     dm.group_name AS metric_group,
     dm.name AS metric,
-    SUM(fa.value) AS value,
+    case when metric_id = 'chps_enrolled'
+      then chp_proj.expected_chps
+      else SUM(fa.value) END AS value,
+      SUM(fa.value) AS value,
     NULL AS location_id,
     fa.period_id,
     fa.metric_id,
@@ -32,6 +35,11 @@ LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
 LEFT JOIN {{ ref('dim_location') }} county_loc ON county_loc.location_id = sub.parent_id
 JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
+LEFT JOIN {{ ref('chp_projections') }} chp_proj ON chp_proj.county = county_loc.name
+WHERE chp_area.level = 'chp area'
+  AND chp_area.name !~ '^[0-9]+$'
+  AND county_loc.name IS NOT NULL
+  AND county_loc.level = 'county'
 WHERE chp_area.level = 'chp area'
   AND chp_area.name !~ '^[0-9]+$'
   AND county_loc.name IS NOT NULL
