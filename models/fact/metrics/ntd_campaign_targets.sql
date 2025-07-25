@@ -18,14 +18,13 @@ WITH campaign_cycles AS (
 -- Get the complete CHP hierarchy for target counties
 chp_hierarchy AS (
   SELECT
-    ch.county_name AS county_name,
-    ch.sub_county_name AS sub_county_name,
-    ch.chu_uuid AS chu_uuid,
-    ch.chu_name AS chu_name,
+    ch.county AS county_name,
+    ch.sub_county AS sub_county_name,
+    ch.community_unit AS chu_name,
     ch.chp_area_uuid AS chp_area_uuid,
     ch.chp_area_name AS chp_area_name
   FROM
-    {{ ref('chp_hierarchy') }} AS ch
+    {{ ref('mv_location_hierarchy') }} AS ch
     JOIN campaign_cycles cc ON ch.county_name = cc.target_county
 ),
 
@@ -42,12 +41,11 @@ population_with_age_at_campaign AS (
     (DATE_PART('month', cc.start_date) - DATE_PART('month', p.date_of_birth)) AS age_in_months_at_campaign,
     ch.county_name,
     ch.sub_county_name,
-    ch.chu_uuid,
     ch.chu_name,
     ch.chp_area_uuid,
     ch.chp_area_name
   FROM
-    {{ ref('patient_f_client') }} p
+    v1.patient_f_client p
     JOIN {{ ref('household') }} hh on p.household_id = hh.uuid
     JOIN {{ ref('chp_hierarchy') }} ch ON hh.chv_area_id = ch.chp_area_uuid
     JOIN campaign_cycles cc ON ch.county_name = cc.target_county
@@ -63,7 +61,6 @@ target_population_aggregated AS (
     start_date,
     county_name,
     sub_county_name,
-    chu_uuid,
     chu_name,
     chp_area_uuid,
     chp_area_name,
@@ -100,7 +97,6 @@ target_population_aggregated AS (
     start_date,
     county_name,
     sub_county_name,
-    chu_uuid,
     chu_name,
     chp_area_uuid,
     chp_area_name
@@ -110,7 +106,6 @@ SELECT
   cycle_name,
   county_name,
   sub_county_name,
-  chu_uuid,
   chu_name,
   chp_area_uuid,
   chp_area_name,

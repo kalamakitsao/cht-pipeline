@@ -19,8 +19,8 @@ WITH campaign_service AS (
         cs_raw.reported::date AS reported_date,
         cs_raw.chu_name,
         cs_raw.facility_name,
-        ch.county_name,
-        ch.sub_county_name,
+        ch.county as county_name,
+        ch.sub_county as sub_county_name,
         SUM(COALESCE(praziquantel_quantity_issued, 0)) AS count_praziquantel_tablets_given,
         SUM(COALESCE(total_mebendazole_tabs_count, 0)) AS count_mebendazole_tablets_given,
         SUM(COALESCE(total_albendazole_tabs_count, 0)) AS count_albendazole_tablets_given,
@@ -50,14 +50,14 @@ WITH campaign_service AS (
         COUNT(*) FILTER (WHERE treated_with_albendazole) AS count_total_treated_with_albe,
         COUNT(*) FILTER (WHERE treated_with_praziquantel) AS count_total_with_prazi
     FROM {{ ref('campaign_service_ntd') }} cs_raw
-    JOIN {{ ref('chp_hierarchy') }} ch ON cs_raw.chp_area_id = ch.uuid
+    JOIN v1.'mv_location_hierarchy' ch ON cs_raw.chp_area_id = ch.uuid
     GROUP BY
         cs_raw.chp_area_id,
         cs_raw.reported::date,
         cs_raw.chu_name,
         cs_raw.facility_name,
-        ch.county_name,
-        ch.sub_county_name
+        ch.county,
+        ch.sub_county
 ),
 campaign_cycles AS (
     -- Your campaign_cycles model

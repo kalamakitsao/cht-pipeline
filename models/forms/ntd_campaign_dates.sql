@@ -24,14 +24,7 @@ SELECT
     'NTD' as campaign_name,
     '2025_01' as cycle_name,
     '2025-06-01'::date as start_date,
-    '2025-08-01'::date as end_date,
-    ARRAY['Kakamega','Siaya','Busia','Transnzoia','Vihiga'] as target_counties
+    '2025-09-30'::date as end_date,
+    ARRAY['Kakamega','Siaya','Bungoma','Transnzoia','Vihiga County'] as target_counties
 
 UNION ALL
-
-SELECT 
-    'NTD' as campaign_name,
-    '2025_00' as cycle_name,
-    '2025-01-01'::date as start_date,
-    '2025-05-01'::date as end_date,
-    ARRAY['Kakamega','Siaya','Busia','Transnzoia','Vihiga'] as target_counties
