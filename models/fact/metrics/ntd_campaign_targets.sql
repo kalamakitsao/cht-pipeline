@@ -47,7 +47,7 @@ population_with_age_at_campaign AS (
   FROM
     v1.patient_f_client p
     JOIN {{ ref('household') }} hh on p.household_id = hh.uuid
-    JOIN {{ ref('chp_hierarchy') }} ch ON hh.chv_area_id = ch.chp_area_uuid
+    JOIN chp_hierarchy ch ON hh.chv_area_id = ch.chp_area_uuid
     JOIN campaign_cycles cc ON ch.county_name = cc.target_county
 
   WHERE
