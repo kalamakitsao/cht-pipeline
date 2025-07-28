@@ -12,7 +12,7 @@
 
 SELECT
     uuid AS location_id,
-    trim(name) AS name,
+    REPLACE(trim(name),E'\u00A0', '') AS name,
     CASE contact_type
         WHEN 'a_county' THEN 'county'
         WHEN 'b_sub_county' THEN 'sub county'

@@ -39,3 +39,5 @@ UNION ALL
 SELECT * FROM {{ ref('fully_immunised_metrics') }}
 UNION ALL
 SELECT * FROM {{ ref('newborn_pnc_metrics') }}
+UNION ALL
+SELECT * FROM {{ ref('expected_chps') }}
