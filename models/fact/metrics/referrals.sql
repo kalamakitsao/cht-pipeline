@@ -13,7 +13,6 @@ WITH combined_referrals AS (
         patient_id
     FROM {{ ref('u5_assessment') }}
     WHERE has_been_referred = TRUE
-      AND reported_by_parent IN (SELECT location_id FROM {{ ref('dim_location') }})
 
     UNION ALL
 
@@ -23,7 +22,6 @@ WITH combined_referrals AS (
         patient_id
     FROM {{ ref('over_five_assessment') }}
     WHERE has_been_referred = TRUE
-      AND reported_by_parent IN (SELECT location_id FROM {{ ref('dim_location') }})
 ),
 
 period_mapped AS (
