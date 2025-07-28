@@ -13,7 +13,7 @@ WITH sha_filtered AS (
         sr.has_sha_registration,
         sr.reported::date AS reported_date
     FROM {{ ref('sha_registration') }} sr
-    JOIN {{ ref('period_date_map') }} pd ON sr.reported::date = pd.date
+    JOIN {{ ref('dim_period_date_map') }} pd ON sr.reported::date = pd.date
 ),
 
 -- Step 2: Join with patients to get household_id
@@ -54,7 +54,7 @@ mapped AS (
         d.households_assessed_sha,
         d.households_with_sha
     FROM daily_metrics d
-    JOIN {{ ref('period_date_map') }} pd ON d.date = pd.date
+    JOIN {{ ref('dim_period_date_map') }} pd ON d.date = pd.date
 ),
 
 -- Step 6: Aggregate & unpivot

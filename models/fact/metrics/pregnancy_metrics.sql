@@ -7,7 +7,7 @@
 
 WITH date_filter AS (
   SELECT DISTINCT date, period_id
-  FROM {{ ref('period_date_map') }}
+  FROM {{ ref('dim_period_date_map') }}
 ),
 
 phv_with_period AS (
@@ -126,7 +126,7 @@ actively_pregnant_women AS (
     COUNT(DISTINCT pw.patient_id) AS value,
     CURRENT_TIMESTAMP AS last_updated
   FROM pregnancy_window pw
-  JOIN {{ ref('period_date_map') }} pd ON pd.date BETWEEN pw.pregnancy_start AND pw.current_edd
+  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date BETWEEN pw.pregnancy_start AND pw.current_edd
   GROUP BY 1, 2
 ),
 

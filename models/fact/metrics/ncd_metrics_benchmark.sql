@@ -8,7 +8,7 @@
 WITH relevant_assessments AS (
   SELECT o.*
   FROM {{ ref('over_five_assessment') }} o
-  JOIN {{ ref('period_date_map') }} pd
+  JOIN {{ ref('dim_period_date_map') }} pd
     ON o.reported::date = pd.date
 ),
 
@@ -72,7 +72,7 @@ dated_metrics AS (
     e.metric_id,
     e.patient_id
   FROM expanded_metrics e
-  JOIN {{ ref('period_date_map') }} pd
+  JOIN {{ ref('dim_period_date_map') }} pd
     ON e.reported_date = pd.date
 ),
 
