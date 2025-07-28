@@ -20,8 +20,6 @@ SELECT * FROM {{ ref('households_registered') }}
 UNION ALL
 SELECT * FROM {{ ref('people_served') }}
 UNION ALL
--- SELECT * FROM {{ ref('active_chps') }}
--- UNION ALL
 SELECT * FROM {{ ref('referrals') }}
 UNION ALL
 SELECT * FROM {{ ref('deaths') }}
@@ -35,8 +33,6 @@ UNION ALL
 SELECT * FROM {{ ref('chps_with_households') }}
 UNION ALL
 SELECT * FROM {{ ref('community_events_participation') }}
--- UNION ALL
--- SELECT * FROM {{ ref('revised_active_chps') }}
 UNION ALL
 SELECT * FROM {{ ref('actively_reporting_chps') }}
 UNION ALL
