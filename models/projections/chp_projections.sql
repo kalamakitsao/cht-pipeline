@@ -1,71 +1,58 @@
 -- models/staging/expected_chps.sql
-{{
-  config(
+{{ config(
     materialized='table',
-    unique_key='county',
-    tags=['reference', 'targets']
-  )
-}}
+    tags=['static', 'reference'],
+    unique_key='location_id'
+) }}
 
-WITH county_targets AS (
-  SELECT 
-    county,
-    expected_chps
-  FROM (VALUES
-    ('Baringo', 1920),
-    ('Bomet', 2301),
-    ('Bungoma', 3590),
-    ('Busia', 2190),
-    ('Elgeyomarakwet', 1260),
-    ('Embu', 1563),
-    ('Garissa', 2500),
-    ('Homa Bay', 2974),
-    ('Isiolo', 753),
-    ('Kajiado', 1994),
-    ('Kakamega', 4250),
-    ('Kericho', 1699),
-    ('Kiambu', 3488),
-    ('Kilifi', 3870),
-    ('Kirinyaga', 1221),
-    ('Kisii', 2940),
-    ('Kisumu', 2981),
-    ('Kitui', 2470),
-    ('Kwale', 1671),
-    ('Laikipia', 1247),
-    ('Lamu County', 529),
-    ('Machakos', 2877),
-    ('Makueni', 3600),
-    ('Mandera', 1268),
-    ('Marsabit', 1983),
-    ('Meru', 3561),
-    ('Migori', 2945),
-    ('Mombasa', 2387),
-    ('Murang''a', 2090), -- Note the escaped single quote
-    ('Nairobi', 7586),
-    ('Nakuru', 3690),
-    ('Nandi', 1520),
-    ('Narok', 2309),
-    ('Nyamira', 1430),
-    ('Nyandarua', 1413),
-    ('Nyeri', 2563),
-    ('Samburu', 1604),
-    ('Siaya', 2128),
-    ('Taita Taveta', 1322),
-    ('Tana River', 940),
-    ('Tharaka Nithi', 1265),
-    ('Transnzoia', 2249),
-    ('Turkana', 2558),
-    ('Uasin Gishu', 2065),
-    ('Vihiga County', 1447),
-    ('Wajir', 1197),
-    ('West Pokot', 2423),
-    ('Kenya', 107831)
-  ) AS t(county, expected_chps)
-)
-
-SELECT
-  county,
-  expected_chps,
-  CURRENT_TIMESTAMP AS last_updated
-FROM county_targets
-WHERE county != 'Kenya' -- Exclude national total from main table
+SELECT *
+FROM (
+    VALUES
+        ('d1f6281a-03da-4286-bf84-c3383b7b5aef', 1920),
+        ('3f085819-cfe8-4fc2-87e1-047bbb3c8ee4', 2301),
+        ('61e9bc54-884b-47aa-8c71-28ad51a438a2', 3590),
+        ('c4308956-d9f2-505d-84eb-bdcf00045d96', 2190),
+        ('55fbfa0e-b6ba-4da6-82da-0dc95d46ea06', 1260),
+        ('7019b36f-ad5c-4bda-bc3f-44765fca9ed5', 1563),
+        ('94cb035f-cc30-44de-b7e3-2a2452546882', 2500),
+        ('b3c15d2f9f426432e27377b8f7000e6a', 2974),
+        ('0cfd59dd-de0d-43e7-847e-636a3a2e634d', 753),
+        ('6811cdfe-67e3-4460-b036-70b4a78c0585', 1994),
+        ('297fee9d-b40d-59e6-b843-ef181ed05b9c', 4250),
+        ('cf18149e-ed61-5f3b-b220-1714d6cc485e', 1699),
+        ('7d2fdbd3-bb5b-49df-b42b-03005312f4fd', 3488),
+        ('75340feb-371a-5e00-a9a7-2650e52c7a44', 3870),
+        ('5bf215af-33ec-5a51-bde8-9fb47de66e9c', 1221),
+        ('b4c8c906-0f1c-46a9-bdd1-fdbf573be60c', 2940),
+        ('7ae9f3b2-f1f1-5309-a0f5-6a5e04cbc03b', 2981),
+        ('2e43f2fc-c5b6-5811-99c2-452433065d11', 2470),
+        ('8711f28cb598826d6c9ec806c6758e83', 1671),
+        ('8e422fa9-07f2-420c-ab78-2ee757afae96', 1247),
+        ('e97eebd1-48f4-4c5d-8199-7204ce50ed8f', 529),
+        ('a157fa2f-6c0d-4a78-9b7b-4ca0fbef4f99', 2877),
+        ('c23e6e5a-c0f3-5231-92d3-273da0c18328', 3600),
+        ('b0e7139e-9f7c-4831-a239-ef2bad7ce4eb', 1268),
+        ('78d9e20b-4f6e-429c-846d-59311a612ea7', 1983),
+        ('35cc31ad-304d-4609-a779-03834e3dc753', 3561),
+        ('863d7210-0847-5229-b3a7-70a3ffa0ca79', 2945),
+        ('db15120b-d641-4bef-b6ef-f40b93d6e805', 2387),
+        ('8a8504ef-e990-4016-b343-801b38e9effb', 2090),
+        ('26f7e38c-4fab-4310-9c2b-f2bae7c464ee', 7586),
+        ('aea980ef-c871-5d2c-8c57-ce11b90ff582', 3690),
+        ('8d7d4b3ebc8243c0bad8ff602c4598e4', 1520),
+        ('8f3bb008-7fdf-44e5-8a7c-8cb78c010352', 2309),
+        ('59e74162-f15d-55e5-b09a-811609aff36f', 1430),
+        ('aab183aa-0ec7-42d0-ad54-0ae654a6543f', 1413),
+        ('a4df9a65-cfcb-4ccc-aa4b-ed39c4202390', 2563),
+        ('6a373771-6e34-4723-9ea5-4032187dac13', 1604),
+        ('765fd1e9-d88a-58c2-9cd5-595d8aa852ee', 2128),
+        ('7cda55d7-cc49-546e-9bf5-4a04c9af0821', 1322),
+        ('86a068a1-fd6d-4381-8cf8-86ea43d95d6d', 940),
+        ('2e61fbb0-c9e9-4842-b075-0de99e025936', 1265),
+        ('67334eaa-dcbe-584f-9a01-29e536de3a71', 2249),
+        ('f6053292-9ef1-53bb-ab2c-bbdaae3ac5ab', 2558),
+        ('828cc8ec-fe23-4520-9107-fa673925bf64', 2065),
+        ('9dbe271a-26fb-4892-aa1b-64772f3fe19c', 1447),
+        ('aa394f54-086d-4e7f-a1fc-fe9dcc52e1ad', 1197),
+        ('b1f1ebc9-9284-4367-81c9-3edb1d012e22', 2423)
+) AS t(location_id, expected_chps)

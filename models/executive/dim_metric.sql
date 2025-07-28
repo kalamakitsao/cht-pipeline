@@ -131,7 +131,7 @@ FROM (
         ('chps_with_hholds', 'CHPs Who Registered Households', 'CHP Service Delivery', 'CHPs that enrolled at least one household', 'count', 'chp_service_delivery'),
         ('perc_active_chps', 'Proportion of Active CHPs', 'CHP Service Delivery', 'Percentage of CHPs actively providing services', 'count', 'chp_service_delivery'),
         ('active_chps_new', 'CHPs Who Visited their requiered Household Target', 'CHP Service Delivery', 'CHPs who met their household visit targets', 'count', 'chp_service_delivery'),
-        
+        ('chps_expected', 'CHPs expected to be working', 'CHP Service Delivery', 'CHPs who are expected to be reporting on eCHIS', 'count', 'chp_service_delivery'),
 
         -- Referral & Death Reporting
         ('total_referrals', 'Total Referrals', 'Referrals', 'Individuals referred by CHPs across all age groups', 'count', 'referrals'),
