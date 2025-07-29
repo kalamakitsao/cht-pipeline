@@ -45,3 +45,34 @@ GROUP BY
     dm.name,
     fa.period_id,
     fa.metric_id
+UNION ALL
+SELECT
+    'county' AS level,
+    county_loc.name AS county,
+    NULL AS sub_county,
+    NULL AS community_unit,
+    NULL AS chp_area,
+    dp.start_date AS period_start,
+    dp.end_date AS period_end,
+    dp.label AS period_label,
+    dm.group_name AS metric_group,
+    dm.name AS metric,
+    SUM(fa.value) AS value,
+    NULL AS location_id,
+    fa.period_id,
+    fa.metric_id,
+    MAX(fa.last_updated) AS last_updated
+FROM {{ ref('fact_aggregate') }} fa
+JOIN {{ ref('dim_location') }} county_loc ON county_loc.location_id = fa.location_id
+JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
+JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
+WHERE fa.metric_id='chps_expected'
+GROUP BY
+    county_loc.name,
+    dp.start_date,
+    dp.end_date,
+    dp.label,
+    dm.group_name,
+    dm.name,
+    fa.period_id,
+    fa.metric_id
