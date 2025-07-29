@@ -152,4 +152,4 @@ FROM (
         ('households_with_sha', 'Households Registered for SHA', 'Households and Population Registration', 'Number of households with at least one member confirmed as registered to SHA', 'count','household_registration')
 
 
-) AS t(metric_id, name, group_name, description, unit, group_id)
+) AS t(metric_id, name, group_name, description, unit, metric_group_id)
