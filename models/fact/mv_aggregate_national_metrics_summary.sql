@@ -17,6 +17,7 @@ SELECT
   p.end_date AS period_end,
   p.label AS period_label,
   m.group_name AS metric_group,
+  m.metric_group_id,
   m.name AS metric,
   SUM(f.value) AS value,
   f.period_id,
