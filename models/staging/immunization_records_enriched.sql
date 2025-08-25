@@ -10,10 +10,10 @@ SELECT
     c.sex,
     i.patient_age_in_months,
     i.has_measles_9,
-    (i.imm_schedule_upto_date)::boolean,
-    (i.needs_immunization_referral)::boolean,
-    (i.needs_deworming_follow_up)::boolean,
-    (i.needs_growth_monitoring_referral)::boolean,
+    NULLIF(i.imm_schedule_upto_date, '')::boolean AS imm_schedule_upto_date,
+    NULLIF(i.needs_immunization_referral, '')::boolean AS needs_immunization_referral,
+    NULLIF(i.needs_deworming_follow_up, '')::boolean AS needs_deworming_follow_up,
+    NULLIF(i.needs_growth_monitoring_referral, '')::boolean AS needs_growth_monitoring_referral,
     c.chp_area_id,
     c.period_id
 FROM {{ source(env_var('POSTGRES_SCHEMA'), 'immunization_status') }} i
