@@ -8,36 +8,48 @@
     ]
 ) }}
 
-SELECT * FROM {{ ref('population') }}
-UNION ALL
-SELECT * FROM {{ ref('u5_conditions') }}
-UNION ALL
-SELECT * FROM {{ ref('sha_metrics') }}
-UNION ALL
-SELECT * FROM {{ ref('chps_enrolled') }}
-UNION ALL
-SELECT * FROM {{ ref('households_registered') }}
-UNION ALL
-SELECT * FROM {{ ref('people_served') }}
-UNION ALL
-SELECT * FROM {{ ref('referrals') }}
-UNION ALL
-SELECT * FROM {{ ref('deaths') }}
-UNION ALL
-SELECT * FROM {{ ref('pregnancy_metrics') }}
-UNION ALL
-SELECT * FROM {{ ref('households_visited') }}
-UNION ALL
-SELECT * FROM {{ ref('ncd_metrics') }}
-UNION ALL
-SELECT * FROM {{ ref('chps_with_households') }}
-UNION ALL
-SELECT * FROM {{ ref('community_events_participation') }}
-UNION ALL
-SELECT * FROM {{ ref('actively_reporting_chps') }}
-UNION ALL
-SELECT * FROM {{ ref('fully_immunised_metrics') }}
-UNION ALL
-SELECT * FROM {{ ref('newborn_pnc_metrics') }}
-UNION ALL
 SELECT * FROM {{ ref('expected_chps') }}
+union all
+SELECT * FROM {{ ref('fact_actively_reporting_chps') }}
+union all
+SELECT * FROM {{ ref('fact_chps_enrolled') }}
+union all
+SELECT * FROM {{ ref('fact_chps_with_households') }}
+union all
+SELECT * FROM {{ ref('fact_community_events_participation') }}
+union all
+SELECT * FROM {{ ref('fact_death_metrics') }}
+union all
+SELECT * FROM {{ ref('fact_households_registered') }}
+union all
+SELECT * FROM {{ ref('fact_households_visited_today') }}
+UNION ALL
+SELECT * FROM {{ ref('fact_households_visited_rolling_year') }}
+UNION ALL
+SELECT * FROM {{ ref('fact_households_visited_all_time') }}
+union all
+SELECT * FROM {{ ref('fact_immunization') }}
+union all
+select * from {{ ref('fact_over_five_metrics_today') }}
+union all
+select * from {{ ref('fact_over_five_metrics_rolling_year') }}
+union all
+select * from {{ ref('fact_over_five_metrics_all_time') }}
+union all
+select * from {{ ref('fact_people_served_today') }}
+union all
+select * from {{ ref('fact_people_served_rolling_year') }}
+union all
+select * from {{ ref('fact_people_served_all_time') }}
+union all
+SELECT * FROM {{ ref('fact_pnc_newborn') }}
+union all
+SELECT * FROM {{ ref('fact_population_net') }}
+union all
+SELECT * FROM {{ ref('fact_pregnancy_metrics') }}
+union all
+select * from {{ ref('fact_referrals_union') }}
+union all
+SELECT * FROM {{ ref('fact_sha_registration') }}
+union all
+SELECT * FROM {{ ref('fact_under_five_conditions') }}

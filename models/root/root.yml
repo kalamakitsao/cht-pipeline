@@ -1,8 +1,36 @@
 version: 2
 
 sources:
-  - name: couchdb
+  - name: v6
     database: "{{ env_var('POSTGRES_DB') }}"
     schema: "{{ env_var('POSTGRES_SCHEMA') }}"
     tables:
       - name: "{{ env_var('POSTGRES_TABLE') }}"
+      - name: contact
+        description: "Raw contact hierarchy data (counties, sub-counties, community units, CHP areas)."
+      - name: patient_f_client
+        description: "Raw patient/client demographic data."
+      - name: household
+        description: "Household table linking clients to households and CHP areas."
+      - name: death_report
+        description: "Raw death reports table"
+      - name: immunization_status
+        description: "Raw immunization status table"
+      - name: over_five_assessment
+        description: "Raw over five assessments table"
+      - name: postnatal_care_service_newborn
+        description: "Raw postnatal care service newborn table"
+      - name: sha_registration
+        description: "Raw SHA registration table"
+      - name: u5_assessment
+        description: "Raw under five assessments table"
+      - name: community_event
+        description: "Raw community events table"
+      - name: household_visit
+        description: "Raw household visit table"
+      - name: pregnancy_home_visit
+        description: "Raw pregnancy home visit table"
+      - name: data_record
+        description: "Raw data record table"
+      - name: postnatal_care_service
+        description: "Raw postnatal care service table"
