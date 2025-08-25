@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: v6
+  - name: afyabi
     database: "{{ env_var('POSTGRES_DB') }}"
     schema: "{{ env_var('POSTGRES_SCHEMA') }}"
     tables:
