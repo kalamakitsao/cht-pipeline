@@ -1,0 +1,40 @@
+-- models/fact/metrics/fact_over_five_metrics_all_time.sql
+{{ config(
+  materialized = 'table',
+  incremental_strategy = 'delete+insert',
+  unique_key = ['location_id','period_id','metric_id'],
+  tags = ['kpi','ncd','cadence_daily'],
+  on_schema_change = 'ignore'
+) }}
+
+SELECT
+  reported_by_parent AS location_id, 
+  date_trunc('month', reported_date) as period_start, 
+  COUNT(DISTINCT patient_id) AS value,
+  UNNEST(ARRAY[
+    CASE WHEN screened_for_diabetes IS TRUE                    THEN 'screened_diabetes'            END,
+    CASE WHEN screened_for_diabetes IS TRUE AND sex='male'     THEN 'screened_diabetes_male'       END,
+    CASE WHEN screened_for_diabetes IS TRUE AND sex='female'   THEN 'screened_diabetes_female'     END,
+    CASE WHEN is_referred_diabetes IS TRUE                     THEN 'referred_diabetes'            END,
+    CASE WHEN is_referred_diabetes IS TRUE AND sex='male'      THEN 'referred_diabetes_male'       END,
+    CASE WHEN is_referred_diabetes IS TRUE AND sex='female'    THEN 'referred_diabetes_female'     END,
+    CASE WHEN screened_for_hypertension IS TRUE                 THEN 'screened_hypertension'        END,
+    CASE WHEN screened_for_hypertension IS TRUE AND sex='male'  THEN 'screened_hypertension_male'   END,
+    CASE WHEN screened_for_hypertension IS TRUE AND sex='female'THEN 'screened_hypertension_female' END,
+    CASE WHEN is_referred_hypertension IS TRUE                  THEN 'referred_hypertension'        END,
+    CASE WHEN is_referred_hypertension IS TRUE AND sex='male'   THEN 'referred_hypertension_male'   END,
+    CASE WHEN is_referred_hypertension IS TRUE AND sex='female' THEN 'referred_hypertension_female' END,
+    CASE WHEN screened_for_mental_health IS TRUE                THEN 'screened_mental_health'       END,
+    CASE WHEN screened_for_mental_health IS TRUE AND sex='male' THEN 'screened_mental_health_male'  END,
+    CASE WHEN screened_for_mental_health IS TRUE AND sex='female' THEN 'screened_mental_health_female' END,
+    CASE WHEN is_referred_mental_health IS TRUE                 THEN 'referred_mental_health'       END,
+    CASE WHEN is_referred_mental_health IS TRUE AND sex='male'  THEN 'referred_mental_health_male'  END,
+    CASE WHEN is_referred_mental_health IS TRUE AND sex='female'THEN 'referred_mental_health_female' END,
+    CASE WHEN has_been_referred IS TRUE                         THEN 'over_5_referred'              END,
+    CASE WHEN has_been_referred IS TRUE AND sex='male'          THEN 'over_5_referred_male'         END,
+    CASE WHEN has_been_referred IS TRUE AND sex='female'        THEN 'over_5_referred_female'       END,
+    'over_5_assessments'
+  ]) AS metric_id
+FROM {{ ref('over_five_assessment_enriched') }}
+WHERE reported >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
+group by location_id,period_start,metric_id;
