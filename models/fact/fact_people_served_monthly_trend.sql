@@ -13,4 +13,4 @@ select
 from from {{ source(env_var('POSTGRES_SCHEMA'), 'data_record') }} dr
 where dr.patient_id is not null
 AND reported >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
-group by location_id,period_start,metric_id;
+group by location_id,period_start,metric_id

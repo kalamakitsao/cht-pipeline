@@ -45,7 +45,7 @@ UNION ALL
 select * from fact_households_visited_monthly_trend
 -- Population served
 UNION ALL
-select * from fact_people_served_monthly_trend
+select * from fact_over_five_metrics_monthly_trend
 -- Total Referrals
 UNION ALL
 select * from fact_people_served_monthly_trend
@@ -54,4 +54,4 @@ UNION ALL
 select * from fact_referrals_monthly_trend
 -- Child health illnesses
 UNION ALL
-select * from fact_referrals_monthly_trend
+select * from fact_under_five_conditions_monthly_trend

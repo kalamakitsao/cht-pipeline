@@ -27,7 +27,7 @@ households AS (
 all_combinations AS (
     -- Cross join all months and locations so we have a complete grid
     SELECT DISTINCT l.location_id, m.period_start
-    FROM {{ source(env_var('POSTGRES_SCHEMA'), 'household') }} l
+    FROM (SELECT DISTINCT chv_area_id AS location_id FROM {{ source(env_var('POSTGRES_SCHEMA'), 'household') }}) l
     CROSS JOIN months m
 ),
 filled AS (
@@ -58,4 +58,4 @@ SELECT
     'households_registered' AS metric_id,
     value
 FROM cumulative
-ORDER BY location_id, period_start;
+ORDER BY location_id, period_start

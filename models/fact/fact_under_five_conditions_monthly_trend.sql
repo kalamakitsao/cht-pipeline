@@ -38,4 +38,4 @@ UNNEST(ARRAY[
 ]) AS metric_id
 FROM FROM {{ ref('under_five_assessment_enriched') }}
 WHERE reported >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
-group by location_id,period_start,metric_id;
+group by location_id,period_start,metric_id

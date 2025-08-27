@@ -23,7 +23,7 @@ WITH combined_referrals AS (
     FROM {{ ref('over_five_assessment_enriched') }}
     WHERE has_been_referred = TRUE
     AND reported >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
-),
+)
 
 select
   r.location_id,
