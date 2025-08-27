@@ -19,7 +19,7 @@ WITH base AS (
 dated AS (
   SELECT b.location_id, pd.period_id, b.household_id
   FROM base b
-  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = b.visit_date
+  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = b.visit_date WHERE pd.period_id_name = 'today'
 ),
 agg AS (
   SELECT location_id, period_id, COUNT(DISTINCT household_id) AS value

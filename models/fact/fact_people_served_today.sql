@@ -17,7 +17,7 @@ with base as (
 mapped as (
   select b.location_id, pd.period_id, b.patient_id
   from base b
-  join {{ ref('dim_period_date_map') }} pd on pd.date = b.report_date
+  join {{ ref('dim_period_date_map') }} pd on pd.date = b.report_date WHERE pd.period_id_name = 'today'
 ),
 agg as (
   select location_id, period_id, count(distinct patient_id) as value

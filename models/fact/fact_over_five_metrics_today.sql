@@ -61,7 +61,7 @@ expanded AS (
 dated AS (
   SELECT e.location_id, pd.period_id, e.metric_id, e.patient_id
   FROM expanded e
-  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = e.report_date
+  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = e.report_date WHERE pd.period_id_name = 'today'
 ),
 
 agg AS (
