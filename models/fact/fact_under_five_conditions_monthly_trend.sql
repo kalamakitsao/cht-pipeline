@@ -36,6 +36,6 @@ UNNEST(ARRAY[
     CASE WHEN (rdt_result IS NOT NULL AND rdt_result <> 'not_done')
         THEN 'u5_tested_malaria' END
 ]) AS metric_id
-FROM FROM {{ ref('under_five_assessment_enriched') }}
+FROM {{ ref('under_five_assessment_enriched') }}
 WHERE reported >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
 group by location_id,period_start,metric_id

@@ -27,7 +27,7 @@ WITH combined_referrals AS (
 
 select
   r.location_id,
-  date_trunc('month', r.reported) as period_start,
+  date_trunc('month', r.report_date) as period_start,
   'total_referrals' AS metric_id,
   count(distinct patient_id) as value
 from combined_referrals r

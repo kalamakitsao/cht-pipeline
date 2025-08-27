@@ -10,7 +10,7 @@ select
   date_trunc('month', reported) as period_start,
   'people_served' as metric_id,
   count(distinct patient_id) as value
-from from {{ source(env_var('POSTGRES_SCHEMA'), 'data_record') }} dr
+from {{ source(env_var('POSTGRES_SCHEMA'), 'data_record') }} dr
 where dr.patient_id is not null
 AND reported >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
 group by location_id,period_start,metric_id
