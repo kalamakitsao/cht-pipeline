@@ -2,8 +2,8 @@
 {{ config(
   materialized = 'incremental',
   incremental_strategy = 'delete+insert',
-  unique_key = ['location_id','period_id','metric_id'],
-  tags = ['kpi','chp_compliance'],
+  unique_key = ['location_id','period_start','metric_id'],
+  tags = ['kpi','cadence_weekly'],
   on_schema_change = 'ignore'
 ) }}
 

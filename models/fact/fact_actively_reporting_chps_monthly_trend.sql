@@ -1,3 +1,11 @@
+-- models/fact/fact_actively_reporting_chps_monthly_trend.sql
+{{ config(
+  materialized = 'incremental',
+  incremental_strategy = 'delete+insert',
+  unique_key = ['location_id','period_start','metric_id'],
+  tags = ['kpi','cadence_weekly'],
+  on_schema_change = 'ignore'
+) }}
 -- Active CHPs
 WITH thresholds AS (
   SELECT *
@@ -16,9 +24,9 @@ scored AS (
            AND (COALESCE(v.value,0)::float / h.value) > th.min_ratio THEN 1
       ELSE 0
     END AS is_active
-  FROM fact_households_registered_monthly_trend h
+  FROM {{ ref('fact_households_registered_monthly_trend') }} h
   CROSS JOIN thresholds th
-  LEFT JOIN fact_households_visited_monthly_trend v
+  LEFT JOIN {{ ref('fact_households_visited_monthly_trend') }} v
          ON h.location_id  = v.location_id
         AND h.period_start = v.period_start
   WHERE h.period_start >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
@@ -26,9 +34,8 @@ scored AS (
 
 SELECT
   location_id,
-  period_start AS period_id,
+  period_start,
   'active_chps_new' AS metric_id,
-  1 AS value,
-  current_timestamp as last_updated
+  1 AS value
 FROM scored
-WHERE is_active = 1;
+WHERE is_active = 1
