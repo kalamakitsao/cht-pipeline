@@ -10,7 +10,7 @@
         {'columns': ['chp_area_id']},
         {'columns': ['muted']}
     ],
-    tags = ['dim', 'sex']
+    tags = ['dim', 'sex','cadence_hourly']
 ) }}
 
 WITH source AS (

@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
     unique_key='location_id',
-    tags=["dimension", "location"],
+    tags=['cadence_hourly'],
     on_schema_change='append_new_columns',
     post_hook=[
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_dim_location_location_id ON {{ this }} (location_id)",

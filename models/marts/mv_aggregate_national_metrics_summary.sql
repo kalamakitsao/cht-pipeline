@@ -7,7 +7,8 @@
       {"columns": ["period_start", "period_end"]},
       {"columns": ["metric_group", "metric"]},
       {"columns": ["period_label"]}
-    ]
+    ],
+    tags=['cadence_hourly']
 ) }}
 
 SELECT

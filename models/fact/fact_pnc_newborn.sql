@@ -10,7 +10,7 @@
   materialized = 'incremental',
   incremental_strategy = 'delete+insert',
   unique_key = ['location_id','period_id','metric_id'],
-  tags = ['kpi','pnc','newborn'],
+  tags = ['kpi','pnc','newborn','cadence_hourly'],
   on_schema_change = 'ignore'
 ) }}
 

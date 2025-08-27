@@ -1,5 +1,5 @@
 -- models/fact/metrics/households_visited_union.sql
-{{ config(materialized='view', tags=['kpi','households_visited']) }}
+{{ config(materialized='view', tags=['kpi','cadence_hourly']) }}
 
 SELECT * FROM {{ ref('fact_households_visited_today') }}
 UNION ALL

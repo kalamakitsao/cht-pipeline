@@ -1,7 +1,7 @@
 -- models/staging/sha_registration_enriched.sql
 {{ config(
   materialized = 'table',
-  tags = ['staging','sha'],
+  tags = ['staging','sha','cadence_hourly'],
   on_schema_change = 'ignore',
   indexes = [
     {'columns': ['reported_date']},

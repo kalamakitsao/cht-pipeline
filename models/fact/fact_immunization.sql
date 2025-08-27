@@ -1,7 +1,7 @@
 -- models/fact/fact_immunization.sql
 {{ config(
   materialized = "table",
-  tags = ["kpi","immunization"]
+  tags = ["kpi","cadence_hourly"]
 ) }}
 
 WITH children AS (

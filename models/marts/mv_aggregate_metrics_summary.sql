@@ -10,7 +10,8 @@
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
       {"columns": ["last_updated"]}
-    ]
+    ],
+    tags=['cadence_hourly']
 ) }}
 
 WITH location_hierarchy AS (

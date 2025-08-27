@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'table',
     indexes = [{'columns': ['uuid'], 'type': 'hash'}],
-    tags = ['dim', 'sex']
+    tags = ['dim', 'sex','cadence_hourly']
 ) }}
 
 SELECT

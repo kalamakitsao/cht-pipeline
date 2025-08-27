@@ -3,7 +3,8 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore'
+    on_schema_change = 'ignore',
+    tags = ['cadence_hourly']
 ) }}
 
 WITH chps AS (

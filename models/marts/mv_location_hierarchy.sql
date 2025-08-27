@@ -8,7 +8,8 @@
         {'columns': ['sub_county']},
         {'columns': ['community_unit']},
         {'columns': ['chp_area']}
-    ]
+    ],
+    tags=['cadence_hourly']
 ) }}
 
 WITH base AS (

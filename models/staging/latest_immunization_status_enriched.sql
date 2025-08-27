@@ -1,6 +1,7 @@
 {{ config(
     materialized = "table",
-    unique_key = ["patient_id", "period_id"]
+    unique_key = ["patient_id", "period_id"],
+    tags = ['cadence_hourly']
 ) }}
 
 WITH ranked AS (

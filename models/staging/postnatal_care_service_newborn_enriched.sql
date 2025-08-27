@@ -1,7 +1,7 @@
 -- models/staging/postnatal_care_service_newborn_enriched.sql
 {{ config(
   materialized = 'table',
-  tags = ['staging','pnc','newborn'],
+  tags = ['staging','pnc','newborn','cadence_hourly'],
   on_schema_change = 'ignore',
   indexes = [
     {'columns': ['reported_date']},

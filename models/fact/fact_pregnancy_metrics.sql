@@ -1,7 +1,7 @@
 {{ config(
   materialized = 'incremental',
   unique_key = ['location_id', 'period_id', 'metric_id'],
-  tags = ['kpi', 'pregnancy'],
+  tags = ['kpi', 'pregnancy','cadence_hourly'],
   on_schema_change = 'ignore'
 ) }}
 

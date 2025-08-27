@@ -1,6 +1,7 @@
 {{ config(
     materialized = "table",
-    unique_key = ["patient_id", "report_date"]
+    unique_key = ["patient_id", "report_date"],
+    tags=['cadence_hourly']
 ) }}
 
 SELECT

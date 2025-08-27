@@ -1,7 +1,7 @@
 -- models/fact/metrics/fact_chps_with_households.sql
 {{ config(
   materialized = 'table',
-  tags = ['kpi','coverage'],
+  tags = ['kpi','coverage','cadence_hourly'],
   on_schema_change = 'ignore'
 ) }}
 

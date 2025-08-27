@@ -4,7 +4,7 @@
   materialized = 'incremental',
   incremental_strategy = 'delete+insert',
   unique_key = ['location_id','period_id','metric_id'],
-  tags = ['kpi','population','net'],
+  tags = ['kpi','population','cadence_hourly'],
   on_schema_change = 'ignore',
   indexes = [
     {"columns": ["period_id","location_id","metric_id"]},

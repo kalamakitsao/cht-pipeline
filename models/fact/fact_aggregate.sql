@@ -5,7 +5,8 @@
         "CREATE INDEX IF NOT EXISTS idx_fact_aggregate_metric_id ON {{ this }} (metric_id)",
         "CREATE INDEX IF NOT EXISTS idx_fact_aggregate_period_id ON {{ this }} (period_id)",
         "CREATE INDEX IF NOT EXISTS idx_fact_aggregate_location_id ON {{ this }} (location_id)"
-    ]
+    ],
+    tags = ['cadence_hourly']
 ) }}
 
 SELECT * FROM {{ ref('expected_chps') }}

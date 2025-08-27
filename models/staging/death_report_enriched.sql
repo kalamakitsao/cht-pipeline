@@ -1,7 +1,7 @@
 -- models/staging/death_report_enriched.sql
 {{ config(
   materialized = 'table',
-  tags = ['staging','death'],
+  tags = ['staging','death','cadence_hourly'],
   on_schema_change = 'ignore',
   indexes = [
     {'columns': ['reported_date']},

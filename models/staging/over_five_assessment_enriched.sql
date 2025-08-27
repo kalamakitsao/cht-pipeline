@@ -1,7 +1,7 @@
 -- models/staging/over_five_assessment_enriched.sql
 {{ config(
   materialized = 'table',
-  tags = ['staging', 'ncd'],
+  tags = ['staging', 'ncd', 'cadence_hourly'],
   on_schema_change = 'ignore',
   indexes = [
     {'columns': ['reported_date']},
