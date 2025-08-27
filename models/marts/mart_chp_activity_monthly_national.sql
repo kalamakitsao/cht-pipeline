@@ -24,6 +24,6 @@ JOIN {{ ref('dim_metric') }} dm ON fa.metric_id = dm.metric_id
 GROUP BY
   fa.period_start,
   fa.metric_id,
-  m.group_name,
-  m.metric_group_id,
-  m.name
+  dm.group_name,
+  dm.metric_group_id,
+  dm.name

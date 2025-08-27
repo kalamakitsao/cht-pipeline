@@ -1,4 +1,3 @@
-        sub_county,
 {{ config(
     materialized = 'table',
     indexes = [

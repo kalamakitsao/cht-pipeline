@@ -2,7 +2,7 @@
 {{ config(
   materialized = 'table',
   incremental_strategy = 'delete+insert',
-  unique_key = ['location_id','period_id','metric_id'],
+  unique_key = ['location_id','period_start','metric_id'],
   tags = ['kpi','ncd','cadence_daily'],
   on_schema_change = 'ignore'
 ) }}
