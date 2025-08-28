@@ -87,4 +87,4 @@ CROSS JOIN months m
 LEFT JOIN aggregated a
     ON l.location_id = a.location_id
    AND m.period_start = a.period_start
-   AND a.metric_id IS NOT NULL;
+   AND a.metric_id IS NOT NULL
