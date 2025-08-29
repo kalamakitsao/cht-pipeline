@@ -1,7 +1,6 @@
 -- models/fact/metrics/fact_actively_reporting_chps.sql
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
+  materialized = 'table',
   unique_key = ['location_id','period_id','metric_id'],
   tags = ['kpi','cadence_hourly'],
   on_schema_change = 'ignore'
@@ -94,13 +93,3 @@ SELECT
   CURRENT_TIMESTAMP AS last_updated
 FROM scored
 WHERE is_active = 1
-
-{% if is_incremental() %}
-  {# Only rewrite the dynamic period set each run #}
-  {% set preds = [
-    "period_id IN (SELECT period_id FROM " ~ ref('dim_period') ~ " WHERE period_id_name IN (" ~
-      "'today','yesterday','last_7_days','last_1_month','this_month','last_month'," ~
-      "'last_3_months','this_quarter','last_quarter','last_6_months','this_week'))"
-  ] %}
-  {{ config(incremental_predicates = preds) }}
-{% endif %}
