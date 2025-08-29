@@ -1,7 +1,6 @@
 -- models/fact/metrics/households_visited_today.sql
 {{ config(
-  materialized='incremental',
-  incremental_strategy='delete+insert',
+  materialized='table',
   unique_key=['location_id','period_id','metric_id'],
   tags=['kpi','households_visited','cadence_hourly'],
   on_schema_change='ignore'
@@ -29,10 +28,3 @@ agg AS (
 SELECT location_id, period_id, 'hh_visited' AS metric_id, value, CURRENT_TIMESTAMP AS last_updated
 FROM agg
 WHERE value > 0
-
-{% if is_incremental() %}
-  {% set preds = [
-    "period_id in (select period_id from " ~ ref('dim_period_date_map') ~ " where date = CURRENT_DATE)"
-  ] %}
-  {{ config(incremental_predicates = preds) }}
-{% endif %}

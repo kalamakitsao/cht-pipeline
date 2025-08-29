@@ -1,6 +1,5 @@
 {{ config(
-  materialized='incremental',
-  incremental_strategy='delete+insert',
+  materialized='table',
   unique_key=['location_id','period_id','metric_id'],
   tags=['kpi','people_served','cadence_twice_daily']
 ) }}
@@ -35,8 +34,3 @@ select
   value,
   current_timestamp as last_updated
 from agg
-
-{% if is_incremental() %}
-  {% set preds = ["period_id in (select period_id from " ~ ref('dim_period_date_map') ~ " where date between date_trunc('year', current_date - interval '1 year') and CURRENT_DATE - interval '1 day')"] %}
-  {{ config(incremental_predicates=preds) }}
-{% endif %}

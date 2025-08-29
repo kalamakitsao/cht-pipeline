@@ -1,7 +1,6 @@
 -- models/fact/metrics/fact_over_five_metrics_today.sql
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
+  materialized = 'table',
   unique_key = ['location_id','period_id','metric_id'],
   tags = ['kpi','ncd','cadence_hourly'],
   on_schema_change = 'ignore'
@@ -74,10 +73,3 @@ agg AS (
 SELECT location_id, period_id, metric_id, value, CURRENT_TIMESTAMP AS last_updated
 FROM agg
 WHERE value > 0
-
-{% if is_incremental() %}
-  {% set preds = [
-    "period_id IN (SELECT period_id FROM " ~ ref('dim_period_date_map') ~ " WHERE date = CURRENT_DATE)"
-  ] %}
-  {{ config(incremental_predicates = preds) }}
-{% endif %}
