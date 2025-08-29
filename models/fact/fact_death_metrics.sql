@@ -1,7 +1,6 @@
 -- models/fact/metrics/fact_death_metrics.sql
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
+  materialized = 'table',
   unique_key = ['location_id','period_id','metric_id'],
   tags = ['kpi','death','cadence_hourly'],
   on_schema_change = 'ignore'
