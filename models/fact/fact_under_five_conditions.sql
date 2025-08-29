@@ -1,7 +1,6 @@
 -- models/fact/metrics/u5_conditions_from_enriched.sql
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
+  materialized = 'table',
   unique_key = ['location_id','period_id','metric_id'],
   tags = ['kpi','u5', 'cadence_hourly'],
   on_schema_change = 'ignore'
@@ -97,11 +96,3 @@ SELECT
   CURRENT_TIMESTAMP AS last_updated
 FROM agg
 WHERE value > 0
-
-{% if is_incremental() %}
-  {# Re-write only periods touched by new/changed rows (today), adjust if you want a wider window #}
-  {% set preds = [
-    "period_id in (select period_id from " ~ ref('dim_period_date_map') ~ " where date >= current_date - interval '1 day')"
-  ] %}
-  {{ config(incremental_predicates = preds) }}
-{% endif %}
