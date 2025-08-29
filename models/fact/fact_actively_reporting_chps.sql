@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'table',
     unique_key = ['location_id', 'period_id', 'metric_id'],
-    tags = ['kpi', 'chp_compliance'],
+    tags = ['kpi', 'cadence_hourly'],
     on_schema_change = 'ignore'
 ) }}
 
