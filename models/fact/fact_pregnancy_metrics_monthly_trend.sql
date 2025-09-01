@@ -184,7 +184,6 @@ SELECT
   location_id,
   period_start,
   metric_id,
-  value,
-  CURRENT_TIMESTAMP AS last_updated
+  value
 FROM all_monthly
 WHERE value > 0
