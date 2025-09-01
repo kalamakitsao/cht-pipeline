@@ -1,6 +1,3 @@
--- depends_on: {{ ref('pregnancy_home_visit') }}
--- depends_on: {{ ref('postnatal_care_service') }}
-
 {{ config(
   materialized = 'incremental',
   incremental_strategy = 'delete+insert',
