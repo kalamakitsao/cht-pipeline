@@ -27,7 +27,7 @@ WITH phv_src AS (
     phv.has_started_anc,
     phv.is_anc_upto_date,
     phv.current_edd
-  FROM {{ ref('pregnancy_home_visit') }} phv
+  FROM {{ source(env_var('POSTGRES_SCHEMA'), 'pregnancy_home_visit') }} phv
   {% if is_incremental() %}
     -- Narrow scan on incremental runs; widen if you expect late arrivals
     WHERE phv.reported >= date_trunc('month', current_date) - interval '12 months'
@@ -44,7 +44,7 @@ pnc_src AS (
     pnc.pnc_service_count,
     pnc.date_of_delivery,
     pnc.is_referred_for_pnc_services
-  FROM {{ ref('postnatal_care_service') }} pnc
+  FROM {{ source(env_var('POSTGRES_SCHEMA'), 'postnatal_care_service') }} pnc
   {% if is_incremental() %}
     WHERE pnc.reported >= date_trunc('month', current_date) - interval '12 months'
   {% endif %}
@@ -122,7 +122,7 @@ latest_phv_with_edd AS (
          phv.current_edd,
          phv.reported::date          AS reported_date,
          date_trunc('month', phv.reported) AS period_start
-  FROM {{ ref('pregnancy_home_visit') }} phv
+  FROM {{ source(env_var('POSTGRES_SCHEMA'), 'pregnancy_home_visit') }} phv
   WHERE phv.is_currently_pregnant = TRUE
     AND phv.current_edd IS NOT NULL
   ORDER BY phv.patient_id, phv.reported DESC
