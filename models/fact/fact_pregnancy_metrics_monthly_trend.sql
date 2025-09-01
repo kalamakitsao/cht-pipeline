@@ -1,13 +1,13 @@
 {{ config(
   materialized = 'incremental',
   incremental_strategy = 'delete+insert',
-  unique_key = ['location_id','period_id','metric_id'],
+  unique_key = ['location_id','period_start','metric_id'],
   tags = ['kpi','pregnancy','pnc','cadence_daily'],
   on_schema_change = 'ignore',
   indexes = [
-    {"columns": ["period_id","location_id","metric_id"]},
+    {"columns": ["period_start","location_id","metric_id"]},
     {"columns": ["metric_id"]},
-    {"columns": ["location_id","period_id"]}
+    {"columns": ["location_id","period_start"]}
   ]
 ) }}
 
