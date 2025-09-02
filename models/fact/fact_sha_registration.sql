@@ -63,12 +63,3 @@ SELECT
   CURRENT_TIMESTAMP AS last_updated
 FROM metrics
 WHERE value > 0
-
-{% if is_incremental() %}
-  {# Only rewrite periods that end recently; tune window to your lateness profile #}
-  {% set preds = [
-    "period_id IN (SELECT period_id FROM " ~ dp ~
-    " WHERE end_date >= CURRENT_DATE - interval '35 days')"
-  ] %}
-  {{ config(incremental_predicates = preds) }}
-{% endif %}
