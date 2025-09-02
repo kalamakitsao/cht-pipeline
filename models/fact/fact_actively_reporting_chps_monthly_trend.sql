@@ -6,13 +6,6 @@
   on_schema_change = 'ignore'
 ) }}
 
-{{
-  /*
-    Configurable thresholds:
-      - active_min_ratio      : fraction e.g. 0.165 (default)
-      - active_min_abs_visits : absolute visits threshold e.g. 15 (default)
-  */
-}}
 {% set min_ratio = var('active_min_ratio', 0.165) %}
 {% set min_abs = var('active_min_abs_visits', 15) %}
 {% set lookback_months = var('hh_lookback_months', 24) %}
