@@ -46,4 +46,4 @@ SELECT
   'active_chps_new' AS metric_id,
   1 AS value
 FROM scored
-WHERE is_active = 1 AND period_start='2025-09-01';
+WHERE is_active = 1
