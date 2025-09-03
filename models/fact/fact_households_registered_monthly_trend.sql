@@ -1,7 +1,9 @@
 -- models/marts/facts/fact_households_registered_monthly_base.sql
 
 {{ config(
-    materialized = "table"
+    materialized = "table",
+  unique_key = ['location_id','period_start','metric_id'],
+  tags = ['kpi','cadence_daily']
 ) }}
 
 -- Determine min and max months, build full month series from first-ever registration to current month,

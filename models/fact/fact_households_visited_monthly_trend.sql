@@ -1,9 +1,8 @@
 -- models/fact/metrics/fact_households_visited_monthly_trend.sql
 {{ config(
-  materialized='incremental',
-  incremental_strategy='delete+insert',
+  materialized='table',
   unique_key=['location_id','period_start','metric_id'],
-  tags=['kpi','households_visited','cadence_weekly'],
+  tags=['kpi','households_visited','cadence_daily'],
   on_schema_change='ignore'
 ) }}
 

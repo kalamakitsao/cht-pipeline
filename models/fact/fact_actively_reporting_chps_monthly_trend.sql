@@ -1,8 +1,7 @@
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
+  materialized = 'table',
   unique_key = ['location_id','period_start','metric_id'],
-  tags = ['kpi','cadence_weekly'],
+  tags = ['kpi','cadence_daily'],
   on_schema_change = 'ignore'
 ) }}
 

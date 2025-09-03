@@ -4,7 +4,7 @@
       {"columns": ["county", "period_start", "metric_id"], "unique": true},
       {"columns": ["metric_group"]}
     ],
-    tags=['cadence_weekly']
+    tags=['cadence_daily']
 ) }}
 WITH location_hierarchy AS (
     SELECT

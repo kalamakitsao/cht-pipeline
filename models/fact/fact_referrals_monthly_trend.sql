@@ -1,8 +1,8 @@
 -- models/fact/metrics/fact_referrals_monthly_trend.sql
 {{ config(
-  materialized='incremental',
+  materialized='table',
   unique_key=['location_id','period_start','metric_id'],
-  tags=['kpi','people_served','cadence_weekly']
+  tags=['kpi','people_served','cadence_daily']
 ) }}
 
 WITH combined_referrals AS (

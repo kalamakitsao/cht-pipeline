@@ -1,9 +1,9 @@
 -- models/fact/metrics/u5_conditions_from_enriched.sql
 {{ config(
-  materialized = 'incremental',
+  materialized = 'table',
   incremental_strategy = 'delete+insert',
   unique_key = ['location_id','period_start','metric_id'],
-  tags = ['kpi','u5','cadence_monthly'],
+  tags = ['kpi','u5','cadence_daily'],
   on_schema_change = 'ignore'
 ) }}
 
