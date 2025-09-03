@@ -76,4 +76,5 @@ SELECT
   households_registered_cumulative as value
 FROM cumulative_all
 WHERE period_start >= date_trunc('month', CURRENT_DATE) - interval '11 months'
+AND location_id IS NOT NULL AND location_id <> ''
 ORDER BY location_id, period_start

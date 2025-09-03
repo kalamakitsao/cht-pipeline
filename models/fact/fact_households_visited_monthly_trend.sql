@@ -15,4 +15,5 @@ select
 from {{ source(env_var('POSTGRES_SCHEMA'), 'household_visit') }} hv
 where hv.household IS NOT NULL
 AND reported >= date_trunc('year', CURRENT_DATE) - INTERVAL '1 year'
+AND hv.reported_by_parent IS NOT NULL AND hv.reported_by_parent <> ''
 group by location_id,period_start,metric_id

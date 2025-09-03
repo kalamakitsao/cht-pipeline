@@ -7,7 +7,6 @@
 ) }}
 
 {% set min_ratio = var('active_min_ratio', 0.165) %}
-{% set min_abs = var('active_min_abs_visits', 15) %}
 
 WITH denom AS (
   -- monthly registered households (NOT cumulative)
@@ -24,20 +23,19 @@ num AS (
 -- Score each CHP-month as active (1) or not (0)
 scored AS (
   SELECT
-    COALESCE(d.location_id, n.location_id) AS location_id,
-    COALESCE(d.period_start, n.period_start)   AS period_start,
+    d.location_id,
+    d.period_start,
     -- Decide active:
     -- 1) if monthly_visits >= absolute threshold -> active
     -- 2) else if monthly_registered > 0 and monthly_visits / monthly_registered >= ratio -> active
     -- 3) else not active
     CASE
-      WHEN COALESCE(n.monthly_visits,0) >= {{ min_abs }} THEN 1
       WHEN COALESCE(d.monthly_registered,0) > 0
            AND (COALESCE(n.monthly_visits,0)::float / d.monthly_registered) >= {{ min_ratio }} THEN 1
       ELSE 0
     END AS is_active
   FROM denom d
-  FULL JOIN num n
+  LEFT JOIN num n
     ON d.location_id = n.location_id
    AND d.period_start = n.period_start
 )
@@ -48,4 +46,4 @@ SELECT
   'active_chps_new' AS metric_id,
   1 AS value
 FROM scored
-WHERE is_active = 1
+WHERE is_active = 1 AND period_start='2025-09-01';
