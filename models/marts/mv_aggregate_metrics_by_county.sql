@@ -46,7 +46,7 @@ GROUP BY
 UNION ALL
 SELECT
     'county' AS level,
-    lh.county,
+    lh.name AS county,
     dp.start_date AS period_start,
     dp.end_date AS period_end,
     dp.label AS period_label,
@@ -58,12 +58,12 @@ SELECT
     fa.metric_id,
     MAX(fa.last_updated) AS last_updated
 FROM {{ ref('fact_aggregate') }} fa
-JOIN location_hierarchy lh ON lh.chp_area_id = fa.location_id
+JOIN {{ ref('dim_location') }} lh ON lh.location_id = fa.location_id
 JOIN {{ ref('dim_period') }} dp ON dp.period_id = fa.period_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
 WHERE fa.metric_id='chps_expected'
 GROUP BY
-    lh.county,
+    lh.name,
     dp.start_date,
     dp.end_date,
     dp.label,
