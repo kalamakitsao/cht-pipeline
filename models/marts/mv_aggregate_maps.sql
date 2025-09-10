@@ -70,21 +70,23 @@ base AS (
 num_sums AS (
   SELECT
     m.metric_id,
+    m.numerator_metric_id,
     b.level,
     b.county,
     b.sub_county,
     b.period_id,
-    ANY_VALUE(b.period_label) AS period_label,
+    MAX(b.period_label) AS period_label,
     SUM(b.value) AS numerator_value
   FROM metrics_map m
   JOIN base b
-    ON b.metric_id = ANY(m.numerator_ids)
-  GROUP BY 1,2,3,4,5
+    ON b.metric_id = LOWER(m.numerator_metric_id)
+  GROUP BY 1,2,3,4,5,6
 ),
 
 den_sums AS (
   SELECT
     m.metric_id,
+    m.denominator_metric_id,
     b.level,
     b.county,
     b.sub_county,
@@ -92,8 +94,8 @@ den_sums AS (
     SUM(b.value) AS denominator_value
   FROM metrics_map m
   JOIN base b
-    ON b.metric_id = ANY(m.denominator_ids)
-  GROUP BY 1,2,3,4,5
+    ON b.metric_id = LOWER(m.denominator_metric_id)
+  GROUP BY 1,2,3,4,5,6
 ),
 
 computed AS (
@@ -104,11 +106,15 @@ computed AS (
     ns.period_id,
     ns.period_label,
     ns.metric_id,
+    ns.numerator_metric_id AS numerator_id,
+    ds.denominator_metric_id AS denominator_id,
     ROUND(
-      COALESCE(ns.numerator_value,0)::NUMERIC
-      / NULLIF(COALESCE(ds.denominator_value,0)::NUMERIC, 0)
+      COALESCE(MAX(ns.numerator_value),0)::NUMERIC
+      / NULLIF(COALESCE(MAX(ds.denominator_value),0)::NUMERIC, 0)
       * mm.scale_factor
     , mm.round_to) AS value,
+    MAX(ns.numerator_value) AS numerator,
+    MAX(ds.denominator_value) AS denominator,
     GREATEST(
       MAX(COALESCE(b.last_updated, NOW())),
       NOW()
@@ -127,8 +133,7 @@ computed AS (
    AND b.county      = ns.county
    AND COALESCE(b.sub_county,'') = COALESCE(ns.sub_county,'')
    AND b.period_id   = ns.period_id
-  GROUP BY 1,2,3,4,5,6, mm.scale_factor, mm.round_to,
-           ns.numerator_value, ds.denominator_value
+  GROUP BY 1,2,3,4,5,6,7,8, mm.scale_factor, mm.round_to
 ),
 
 final AS (
@@ -143,6 +148,10 @@ final AS (
     d.metric,
     c.metric_id,
     c.value,
+    c.numerator_id,
+    c.numerator,
+    c.denominator_id,
+    c.denominator,
     c.last_updated
   FROM computed c
   LEFT JOIN dim_metric_enriched d
