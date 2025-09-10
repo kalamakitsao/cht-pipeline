@@ -21,7 +21,7 @@ WITH metrics_map AS (
       ('rate_active_chp', 'active_chps_new', 'expected_chps', 1.0, 3),
       ('rate_echis_pop_coverage', 'people_registered', 'population_projection', 1.0, 3),
       ('rate_household_visit', 'households_visited', 'households_target_or_total', 1.0, 3)
-  ) AS t(metric_id, numerator_ids, denominator_ids, scale_factor, round_to)
+  ) AS t(metric_id, numerator_metric_id, denominator_metric_id, scale_factor, round_to)
 ),
 
 dim_metric_enriched AS (
