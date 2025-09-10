@@ -9,20 +9,18 @@ WITH metrics_map AS (
   SELECT *
   FROM (
     VALUES
-      VALUES
-      ('rate_teen_pregnancy',            'teen_pregnancies',           'currently_pregnant',            1.0,   3),
-      ('rate_maternal_death',            'maternal_deaths',            'deliveries',                    100000.0, 1),
-      ('rate_malnutrition_referral',     'u5_malnutrition_referred',   'u5_screened',                   1.0,   3),
-      ('rate_pneumonia_referral',        'u5_pneumonia_referred',      'u5_screened',                   1.0,   3),
-      ('rate_malaria_referral',          'u5_malaria_referred',        'u5_screened',                   1.0,   3),
-      ('rate_diarrhoea_referral',        'u5_diarrhoea_referred',      'u5_screened',                   100.0,   2),
-      ('rate_mental_health_referral',    'mental_health_referred',                'mh_screened',                   1.0,   3),
-      ('rate_hypertension_referral',     'hypertension_referred',               'htn_screened',                  1.0,   3),
-      ('rate_diabetes_referral',         'diabetes_referred',                'dm_screened',                   1.0,   3),
-      ('rate_active_chp',                'active_chps_new',                'expected_chps',                 1.0,   3),
-      ('rate_echis_pop_coverage',        'people_registered',          'population_projection',         1.0,   3),
-      ('rate_household_visit',           'households_visited',         'households_target_or_total',    1.0,   3)
-  ) AS t(metric_id, numerator_metric_id, denominator_metric_id, scale_factor, round_to)
+      ('rate_teen_pregnancy', 'teen_pregnancies', 'currently_pregnant', 1.0, 3),
+      ('rate_maternal_death', 'maternal_deaths', 'deliveries', 100000.0, 1),
+      ('rate_malnutrition_referral', 'u5_malnutrition_referred', 'u5_screened', 1.0, 3),
+      ('rate_pneumonia_referral', 'u5_pneumonia_referred', 'u5_screened', 1.0, 3),
+      ('rate_malaria_referral', 'u5_malaria_referred', 'u5_screened', 1.0, 3),
+      ('rate_diarrhoea_referral', 'u5_diarrhoea_referred', 'u5_screened', 100.0, 2),
+      ('rate_mental_health_referral', 'mental_health_referred', 'mh_screened', 1.0, 3),
+      ('rate_hypertension_referral', 'hypertension_referred', 'htn_screened', 1.0, 3),
+      ('rate_diabetes_referral', 'diabetes_referred', 'dm_screened', 1.0, 3),
+      ('rate_active_chp', 'active_chps_new', 'expected_chps', 1.0, 3),
+      ('rate_echis_pop_coverage', 'people_registered', 'population_projection', 1.0, 3),
+      ('rate_household_visit', 'households_visited', 'households_target_or_total', 1.0, 3)
   ) AS t(metric_id, numerator_ids, denominator_ids, scale_factor, round_to)
 ),
 
@@ -159,6 +157,3 @@ final AS (
 )
 
 SELECT * FROM final
-{% if is_incremental() %}
-WHERE period_id >= (SELECT COALESCE(MAX(period_id), '000000') FROM {{ this }})
-{% endif %}
