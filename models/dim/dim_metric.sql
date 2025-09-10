@@ -149,7 +149,7 @@ FROM (
         ('households_with_active_insurance', 'Households With Active Insurance Cover', 'Households and Population Registration', 'Number of households that have an active insurance cover', 'count','household_registration'),
         ('households_registered_on_sha', 'Households Registered on SHA', 'Households and Population Registration', 'Number of households registered with NHIF, SHIF, or SHA schemes', 'count','household_registration'),
         ('households_assessed_sha', 'Households Assessed for SHA Registration', 'Households and Population Registration', 'Number of households assessed for SHA registration (true or false)', 'count','household_registration'),
-        ('households_with_sha', 'Households Registered for SHA', 'Households and Population Registration', 'Number of households with at least one member confirmed as registered to SHA', 'count','household_registration')
+        ('households_with_sha', 'Households Registered for SHA', 'Households and Population Registration', 'Number of households with at least one member confirmed as registered to SHA', 'count','household_registration'),
 
         -- Additional metrics to be included in maps
         ('rate_teen_pregnancy',          'Teen pregnancies rates',        'Maternal Health Services',  'Proportion of registered pregnancies that are of girls aged between 10-19 years', 'proportion', 'maternal_health'),
