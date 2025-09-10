@@ -151,5 +151,22 @@ FROM (
         ('households_assessed_sha', 'Households Assessed for SHA Registration', 'Households and Population Registration', 'Number of households assessed for SHA registration (true or false)', 'count','household_registration'),
         ('households_with_sha', 'Households Registered for SHA', 'Households and Population Registration', 'Number of households with at least one member confirmed as registered to SHA', 'count','household_registration')
 
+        -- Additional metrics to be included in maps
+        ('rate_teen_pregnancy',          'Teen pregnancies rates',        'Maternal Health Services',  'Proportion of registered pregnancies that are of girls aged between 10-19 years', 'proportion', 'maternal_health'),
+        ('rate_maternal_death',          'Maternal death rates',          'Maternal Health Services',  'Maternal mortality rate for every 100,000 births registered',                     'float', 'maternal_health'),
+        ('rate_malnutrition_referral',   'Malnutrition rates by county',  'Child Health (<5 years)',   'Proportion of screened children referral for suspected malnutrition',             'proportion', 'child_health'),
+        ('rate_pneumonia_referral',      'Pneumonia referral rates',      'Child Health (<5 years)',   'Proportion of screened children referral for suspected pneumonia',                'proportion', 'child_health'),
+        ('rate_malaria_referral',        'Malaria referral rates',        'Child Health (<5 years)',   'Proportion of screened children referral for suspected malaria',                  'proportion', 'child_health'),
+        ('rate_diarrhoea_referral',      'Diarrhoea referral rates',      'Child Health (<5 years)',   'Proportion of screened children referral for suspected diarrhoea',                'proportion', 'child_health'),
+        ('rate_mental_health_referral',  'Mental Health referral rates',  'NCDs (Chronic Illnesses)',  'Proportion of people screened for mental health that were referred for further assessment', 'proportion', 'ncds'),
+        ('rate_hypertension_referral',   'Hypertension referral rates',   'NCDs (Chronic Illnesses)',  'Proportion of people screened for hypertension that were referred for further assessment', 'proportion', 'ncds'),
+        ('rate_diabetes_referral',       'Diabetes referral rates',       'NCDs (Chronic Illnesses)',  'Proportion of people screened for diabetes that were referred for further assessment', 'proportion', 'ncds'),
+        ('rate_active_chp',              'Active CHPs',                   'CHP Service Delivery',      'CHPs who met the performance target',                                             'proportion', 'chp_service_delivery'),
+        ('rate_echis_pop_coverage',      'Registered Population on eCHIS','CHP Service Delivery',      'Proportion of projected population registered by CHPs',                           'proportion', 'chp_service_delivery'),
+        ('rate_household_visit',         'Households visit rate',         'CHP Service Delivery',      'Household visit coverage rates by CHPs',                                          'proportion', 'chp_service_delivery'),
+        ('monthly_rates_active_chp',     'Monthly Active CHPs',           'CHP Service Delivery',      'Monthly active CHP trends',                                                       'proportion', 'chp_service_delivery'),
+        ('monthly_rates_pop_coverage',   'Monthly People served',         'CHP Service Delivery',      'Monthly people served coverage rates',                                            'proportion', 'chp_service_delivery'),
+        ('monthly_rates_household_visit','Monthly Households visited',    'CHP Service Delivery',      'Monthly household visit coverage rates',                                          'proportion', 'chp_service_delivery')
+
 
 ) AS t(metric_id, name, group_name, description, unit, metric_group_id)
