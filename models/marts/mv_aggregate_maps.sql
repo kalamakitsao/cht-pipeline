@@ -14,16 +14,30 @@ WITH metrics_map AS (
       ('rate_malnutrition_referral', 'referred_for_malnutrition', 'u5_assessed', 1.0, 3),
       ('rate_pneumonia_referral', 'referred_for_pneumonia', 'u5_assessed', 1.0, 3),
       ('rate_malaria_referral', 'referred_for_malaria', 'u5_assessed', 1.0, 3),
-      ('rate_diarrhoea_referral', 'referred_for_diarrhoea', 'u5_assessed', 100.0, 2),
+      ('rate_diarrhoea_referral', 'referred_for_dirrhoea', 'u5_assessed', 100.0, 2),
       ('rate_mental_health_referral', 'referred_mental_health', 'screened_mental_health', 1.0, 3),
       ('rate_hypertension_referral', 'referred_hypertension', 'screened_hypertension', 1.0, 3),
       ('rate_diabetes_referral', 'referred_diabetes', 'screened_diabetes', 1.0, 3),
-      ('rate_active_chp', 'active_chps_new', 'registered_chps', 1.0, 3),
-      ('rate_echis_pop_coverage', 'people_registered', 'population_projection', 1.0, 3),
-      ('rate_household_visit', 'households_visited', 'household_registered', 1.0, 3)
+      ('rate_active_chp', 'active_chps_new', 'chps_enrolled', 1.0, 3),
+      ('rate_echis_pop_coverage', 'population', 'population_projection', 1.0, 3),
+      ('rate_household_visit', 'hh_visited', 'households_registered', 1.0, 3)
   ) AS t(metric_id, numerator_metric_id, denominator_metric_id, scale_factor, round_to)
 ),
 
+chps_enrolled as
+(
+  SELECT
+    LOWER(level) AS level,
+    county,
+    sub_county,
+    period_id,
+    period_label,
+    COUNT(DISTINCT location_id) AS value,
+    'active_chps_new' AS metric_id,
+    MAX(last_updated) AS last_updated
+  FROM {{ ref('mv_location_hierarchy') }}
+  GROUP BY 1,2,3,4,5
+),
 dim_metric_enriched AS (
   SELECT
     LOWER(TRIM(metric_id)) AS metric_id,

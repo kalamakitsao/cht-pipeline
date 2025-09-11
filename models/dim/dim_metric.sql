@@ -27,7 +27,7 @@ FROM (
         ('referred_for_malaria', 'Referred for Malaria', 'Child Health (<5 years)', 'Children referred for malaria treatment', 'count', 'child_health'),
         ('referred_for_pneumonia', 'Referred for Pneumonia', 'Child Health (<5 years)', 'Children referred for pneumonia treatment', 'count', 'child_health'),
         ('referred_for_malnutrition', 'Referred for Malnutrition', 'Child Health (<5 years)', 'Children referred for malnutrition', 'count', 'child_health'),
-        ('referred_for_dirrhoea', 'Referred for Diarrhoea', 'Child Health (<5 years)', 'Children referred for diarrhoea treatment', 'count', 'child_health'),
+        ('referred_for_diarrhoea', 'Referred for Diarrhoea', 'Child Health (<5 years)', 'Children referred for diarrhoea treatment', 'count', 'child_health'),
         ('u5_referred', 'Under 5 Referred', 'Child Health (<5 years)', 'Children Referred for Further Assessment', 'count', 'child_health'),
         ('u5_referred_male', 'Under 5 Referred Male', 'Male Child Health (<5 years)', 'Children Referred for Further Assessment', 'count', 'child_health'),
         ('u5_referred_female', 'Under 5 Referred Female', 'Female Child Health (<5 years)', 'Children Referred for Further Assessment', 'count', 'child_health'),
