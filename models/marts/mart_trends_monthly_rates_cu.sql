@@ -2,14 +2,7 @@
   materialized = 'table',
   unique_key   = ['level','county','sub_county','community_unit','period_start','metric_id'],
   on_schema_change = 'ignore',
-  tags = ['trends','monthly','community_unit','api'],
-  indexes = [
-    {'columns': ['county']},
-    {'columns': ['sub_county']},
-    {'columns': ['community_unit']},
-    {'columns': ['period_start']},
-    {'columns': ['metric_id']}
-    ]
+  tags = ['trends','monthly','community_unit','api']
 ) }}
 
 WITH metrics_map AS (
