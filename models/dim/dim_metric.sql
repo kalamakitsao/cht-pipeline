@@ -120,6 +120,7 @@ FROM (
         ('exp_population', 'Expected Population Registration', 'Households and Population Registration', 'Expected vs registered population', 'count', 'household_registration'),
         ('perc_hh_registered', 'Household Registration Rate', 'Households and Population Registration', 'Proportion of HHs registered per county', 'count','household_registration'),
         ('perc_hh_with_insurance', 'HHs with Insurance', 'Households and Population Registration', 'Proportion of households with active insurance', 'count','household_registration'),
+        ('population_projection', 'Projected Population', 'Households and Population Registration', 'Projected population size in the area based on KNBS projections', 'count','household_registration'),
 
         -- CHP Service Delivery & Performance
         ('hh_visited', 'Households Visited', 'CHP Service Delivery', 'Households visited by CHPs for services', 'count','chp_service_delivery'),

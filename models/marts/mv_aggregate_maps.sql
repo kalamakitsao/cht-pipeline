@@ -33,7 +33,48 @@ dim_metric_enriched AS (
   FROM {{ ref('dim_metric') }}
 ),
 
-county_base AS (
+county_periods AS (
+  SELECT
+    LOWER(level) AS level,
+    county,
+    period_id,
+    period_label
+  FROM {{ ref('mv_aggregate_metrics_by_county') }}
+  GROUP BY 1,2,3,4
+),
+
+popn_closest AS (
+  SELECT county, projection
+  FROM (
+    SELECT
+      p.county,
+      p.population::numeric AS projection,
+      p.year::int AS yr,
+      ROW_NUMBER() OVER (
+        PARTITION BY LOWER(TRIM(p.county))
+        ORDER BY ABS(p.year::int - EXTRACT(YEAR FROM CURRENT_DATE)::int), p.year::int DESC
+      ) AS rn
+    FROM {{ ref('population_projection') }} p
+  ) s
+  WHERE rn = 1
+),
+
+popn_rows AS (
+  SELECT
+    'county'::text AS level,
+    cp.county,
+    NULL::text AS sub_county,
+    cp.period_id,
+    cp.period_label,
+    'population_projection'::text AS metric_id,
+    pc.projection AS value,
+    CURRENT_TIMESTAMP AS last_updated
+  FROM county_periods cp
+  JOIN popn_closest pc
+    ON LOWER(TRIM(pc.county)) = LOWER(TRIM(cp.county))
+),
+
+county_base_plus AS (
   SELECT
     LOWER(level) AS level,
     county,
@@ -44,6 +85,10 @@ county_base AS (
     value::NUMERIC AS value,
     last_updated
   FROM {{ ref('mv_aggregate_metrics_by_county') }}
+  UNION ALL
+  SELECT
+    level, county, sub_county, period_id, period_label, metric_id, value, last_updated
+  FROM popn_rows
 ),
 
 sub_county_base AS (
@@ -60,7 +105,7 @@ sub_county_base AS (
 ),
 
 base AS (
-  SELECT * FROM county_base
+  SELECT * FROM county_base_plus
   UNION ALL
   SELECT * FROM sub_county_base
 ),
