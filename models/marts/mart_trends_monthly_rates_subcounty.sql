@@ -1,9 +1,8 @@
-{{ config(
+{{ config (
   materialized = 'table',
   unique_key   = ['level','county','period_start','metric_id'],
   on_schema_change = 'ignore',
   tags = ['trends','monthly','county','api'],
-  ,
   indexes = [
     {'columns': ['county']},
     {'columns': ['sub_county']},
