@@ -24,20 +24,6 @@ WITH metrics_map AS (
   ) AS t(metric_id, numerator_metric_id, denominator_metric_id, scale_factor, round_to)
 ),
 
-chps_enrolled as
-(
-  SELECT
-    LOWER(level) AS level,
-    county,
-    sub_county,
-    period_id,
-    period_label,
-    COUNT(DISTINCT location_id) AS value,
-    'active_chps_new' AS metric_id,
-    MAX(last_updated) AS last_updated
-  FROM {{ ref('mv_location_hierarchy') }}
-  GROUP BY 1,2,3,4,5
-),
 dim_metric_enriched AS (
   SELECT
     LOWER(TRIM(metric_id)) AS metric_id,
