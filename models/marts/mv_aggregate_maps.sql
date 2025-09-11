@@ -12,15 +12,15 @@ WITH metrics_map AS (
       ('rate_teen_pregnancy', 'new_teen_pregnancies', 'new_pregnancies', 1.0, 3),
       ('rate_maternal_death', 'maternal_deaths', 'deliveries', 100000.0, 1),
       ('rate_malnutrition_referral', 'referred_for_malnutrition', 'u5_assessed', 1.0, 3),
-      ('rate_pneumonia_referral', 'u5_pneumonia_referred', 'u5_assessed', 1.0, 3),
-      ('rate_malaria_referral', 'u5_malaria_referred', 'u5_assessed', 1.0, 3),
-      ('rate_diarrhoea_referral', 'u5_diarrhoea_referred', 'u5_assessed', 100.0, 2),
+      ('rate_pneumonia_referral', 'referred_for_pneumonia', 'u5_assessed', 1.0, 3),
+      ('rate_malaria_referral', 'referred_for_malaria', 'u5_assessed', 1.0, 3),
+      ('rate_diarrhoea_referral', 'referred_for_diarrhoea', 'u5_assessed', 100.0, 2),
       ('rate_mental_health_referral', 'referred_mental_health', 'screened_mental_health', 1.0, 3),
       ('rate_hypertension_referral', 'referred_hypertension', 'screened_hypertension', 1.0, 3),
       ('rate_diabetes_referral', 'referred_diabetes', 'screened_diabetes', 1.0, 3),
       ('rate_active_chp', 'active_chps_new', 'registered_chps', 1.0, 3),
       ('rate_echis_pop_coverage', 'people_registered', 'population_projection', 1.0, 3),
-      ('rate_household_visit', 'households_visited', 'households_target_or_total', 1.0, 3)
+      ('rate_household_visit', 'households_visited', 'household_registered', 1.0, 3)
   ) AS t(metric_id, numerator_metric_id, denominator_metric_id, scale_factor, round_to)
 ),
 
