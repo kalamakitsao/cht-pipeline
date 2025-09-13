@@ -109,6 +109,16 @@ FROM (
         ('screened_mental_health_female', 'Female Screened for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of female screened for Mental Health', 'count','ncds'),
         ('referred_mental_health_male', 'Male Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of Male referred for Mental Health care', 'count','ncds'),
         ('referred_mental_health_female', 'Female Referred for Mental Health', 'NCDs (Chronic Illnesses)', 'Number of Female referred for Mental Health care', 'count','ncds'),
+        ('screenings_mental_health', 'Screenings conducted for mental health', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for mental health', 'count', 'ncds'),
+        ('screenings_mental_health_male', 'Screenings conducted for mental health - Male', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for mental health on male population', 'count', 'ncds'),
+        ('screenings_mental_health_female', 'Screenings conducted for mental health - Female', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for mental health on female population', 'count', 'ncds'),
+        ('screenings_hypertension', 'Screenings conducted for Hypertension', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for Hypertension', 'count', 'ncds'),
+        ('screenings_hypertension_male', 'Screenings conducted for Hypertension', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for Hypertension on male population', 'count', 'ncds'),
+        ('screenings_hypertension_female', 'Screenings conducted for Hypertension', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for Hypertension on female population', 'count', 'ncds'),
+        ('screenings_diabetes', 'Screenings conducted for Diabetes', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for Diabetes', 'count', 'ncds'),
+        ('screenings_diabetes_male', 'Screenings conducted for Diabetes - Male', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for Diabetes on male population', 'count', 'ncds'),
+        ('screenings_diabetes_female', 'Screenings conducted for Diabetes - Female', ' NCDs (Chronic Illnesses)', 'Number of times CHPs have conducted a screening for Diabetes on female population', 'count', 'ncds'),
+        
         -- Household & Population Registration
         ('households_registered', 'Households Registered', 'Households and Population Registration', 'Number of households registered in eCHIS', 'count','household_registration'),
         ('population', 'Total Population', 'Households and Population Registration', 'Individuals registered in eCHIS', 'count','household_registration'),
