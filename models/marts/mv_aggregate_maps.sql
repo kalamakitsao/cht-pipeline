@@ -230,4 +230,4 @@ final AS (
 )
 
 SELECT * FROM final
-ORDER BY metric_id, period_id;
+ORDER BY metric_id, period_id
