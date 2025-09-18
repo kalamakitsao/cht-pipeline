@@ -18,7 +18,7 @@ WITH metrics_map AS (
       ('rate_mental_health_referral', 'referred_mental_health', 'screened_mental_health', 1.0, 3),
       ('rate_hypertension_referral', 'referred_hypertension', 'screened_hypertension', 1.0, 3),
       ('rate_diabetes_referral', 'referred_diabetes', 'screened_diabetes', 1.0, 3),
-      ('rate_active_chp', 'active_chps_new', 'chps_enrolled', 1.0, 3),
+      ('rate_active_chps', 'active_chps_new', 'chps_enrolled', 1.0, 3),
       ('rate_echis_pop_coverage', 'population', 'population_projection', 1.0, 3),
       ('rate_household_visit', 'hh_visited', 'households_registered', 1.0, 3)
   ) AS t(metric_id, numerator_metric_id, denominator_metric_id, scale_factor, round_to)

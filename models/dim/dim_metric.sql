@@ -13,6 +13,22 @@ FROM (
     VALUES
         -- Child Health: Assessments and ICCM
         ('u5_assessed', 'Total U5 Population Assessed', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
+        ('u5_assessed_diarrhoea', 'Total U5 Population Assessed for Diarrhoea', 'Child Health (<5 years)', 'Children under 5 assessed for Diarrhoea during the period', 'count', 'child_health'),
+        ('u5_assessed_diarrhoea_male', 'Total U5 Population Assessed for Diarrhoea', 'Child Health (<5 years)', 'Children under 5 assessed for Diarrhoea during the period', 'count', 'child_health'),
+        ('u5_assessed_diarrhoea_female', 'Total U5 Population Assessed for Diarrhoea', 'Child Health (<5 years)', 'Children under 5 assessed for Diarrhoea during the period', 'count', 'child_health'),
+        ('u5_assessed_pneumonia', 'Total U5 Population Assessed for pneumonia', 'Child Health (<5 years)', 'Children under 5 assessed for Pneumonia during the period', 'count', 'child_health'),
+        ('u5_assessed_pneumonia_male', 'Total U5 Population Assessed for pneumonia', 'Child Health (<5 years)', 'Children under 5 assessed for Pneumonia during the period', 'count', 'child_health'),
+        ('u5_assessed_pneumonia_female', 'Total U5 Population Assessed for pneumonia', 'Child Health (<5 years)', 'Children under 5 assessed for Pneumonia during the period', 'count', 'child_health'),
+        ('u5_assessed_malaria', 'Total U5 Population Assessed for malaria', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
+        ('u5_assessed_malaria_male', 'Total U5 Population Assessed for malaria', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
+        ('u5_assessed_malaria_female', 'Total U5 Population Assessed for malaria', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
+        ('u5_assessed_malnutrition', 'Total U5 Population Assessed for malnutrition', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
+        ('u5_assessed_malnutrition_male', 'Total U5 Population Assessed for malnutrition', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
+        ('u5_assessed_malnutrition_female', 'Total U5 Population Assessed for malnutrition', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
+        ('u5_assessed_exclusive_breastfeeding', 'Under 6 months Assessed for exclusive breastfeeding', 'Child Health (<5 years)', 'Children under 6 months Assessed for exclusive breastfeeding', 'count', 'child_health'),
+        ('u5_exclusive_breastfeeding', 'Under 6 months exclusive breastfeeding', 'Child Health (<5 years)', 'Children under 6 months on exclusive breastfeeding', 'count', 'child_health'),
+        
+
         ('u5_diarrhea_cases', 'U5 Diarrhea Cases', 'Child Health (<5 years)', 'Confirmed diarrhea cases in children under 5', 'count', 'child_health'),
         ('u5_pneumonia_cases', 'U5 Pneumonia Cases', 'Child Health (<5 years)', 'Suspected pneumonia cases in children under 5', 'count', 'child_health'),
         ('u5_malnutrition_cases', 'U5 Malnutrition Cases', 'Child Health (<5 years)', 'Suspected malnutrition cases in children under 5', 'count', 'child_health'),
@@ -172,9 +188,11 @@ FROM (
         ('rate_mental_health_referral', 'Mental Health referral rates', 'NCDs (Chronic Illnesses)', 'Proportion of people screened for mental health that were referred for further assessment', 'proportion', 'ncds'),
         ('rate_hypertension_referral', 'Hypertension referral rates', 'NCDs (Chronic Illnesses)', 'Proportion of people screened for hypertension that were referred for further assessment', 'proportion', 'ncds'),
         ('rate_diabetes_referral','Diabetes referral rates','NCDs (Chronic Illnesses)', 'Proportion of people screened for diabetes that were referred for further assessment', 'proportion', 'ncds'),
-        ('rate_active_chp', 'Active CHPs','CHP Service Delivery', 'CHPs who met the performance target', 'proportion', 'chp_service_delivery'),
+        ('rate_active_chps', 'Active CHPs','CHP Service Delivery', 'CHPs who met the performance target', 'proportion', 'chp_service_delivery'),
         ('rate_echis_pop_coverage', 'Registered Population on eCHIS','CHP Service Delivery', 'Proportion of projected population registered by CHPs','proportion', 'chp_service_delivery'),
         ('rate_household_visit','Households visit rate','CHP Service Delivery', 'Household visit coverage rates by CHPs', 'proportion', 'chp_service_delivery'),
+
+        -- Monthly rates for dashboard
         ('monthly_rates_active_chp', 'Monthly Active CHPs', 'CHP Service Delivery', 'Monthly active CHP trends', 'proportion', 'chp_service_delivery'),
         ('monthly_rates_pop_coverage', 'Monthly People served','CHP Service Delivery', 'Monthly people served coverage rates', 'proportion', 'chp_service_delivery'),
         ('monthly_rates_household_visit','Monthly Households visited', 'CHP Service Delivery', 'Monthly household visit coverage rates', 'proportion', 'chp_service_delivery')
