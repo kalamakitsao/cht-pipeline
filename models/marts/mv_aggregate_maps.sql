@@ -1,5 +1,5 @@
 {{ config(
-  materialized = 'incremental',
+  materialized = 'table',
   unique_key   = ['level','county','sub_county','period_id','metric_id'],
   on_schema_change = 'ignore',
   tags = ['maps','metrics','api']
@@ -9,12 +9,12 @@ WITH metrics_map AS (
   SELECT *
   FROM (
     VALUES
-      ('rate_teen_pregnancy', 'new_teen_pregnancies', 'new_pregnancies', 1.0, 3),
-      ('rate_maternal_death', 'maternal_deaths', 'deliveries', 100000.0, 1),
+      ('rate_teen_pregnancy','new_teen_pregnancies','new_pregnancies', 1.0, 3),
+      ('rate_maternal_death', 'maternal_deaths', '1', 1.0, 1),
       ('rate_malnutrition_referral', 'referred_for_malnutrition', 'u5_assessed', 1.0, 3),
       ('rate_pneumonia_referral', 'referred_for_pneumonia', 'u5_assessed', 1.0, 3),
       ('rate_malaria_referral', 'referred_for_malaria', 'u5_assessed', 1.0, 3),
-      ('rate_diarrhoea_referral', 'referred_for_dirrhoea', 'u5_assessed', 100.0, 2),
+      ('rate_diarrhoea_referral', 'referred_for_dirrhoea', 'u5_assessed', 1.0, 2),
       ('rate_mental_health_referral', 'referred_mental_health', 'screened_mental_health', 1.0, 3),
       ('rate_hypertension_referral', 'referred_hypertension', 'screened_hypertension', 1.0, 3),
       ('rate_diabetes_referral', 'referred_diabetes', 'screened_diabetes', 1.0, 3),
@@ -40,6 +40,9 @@ county_periods AS (
     period_id,
     period_label
   FROM {{ ref('mv_aggregate_metrics_by_county') }}
+  {% if is_incremental() %}
+    WHERE period_id >= (SELECT COALESCE(MAX(period_id), 0) FROM {{ this }})
+  {% endif %}
   GROUP BY 1,2,3,4
 ),
 
@@ -85,6 +88,9 @@ county_base_plus AS (
     value::NUMERIC AS value,
     last_updated
   FROM {{ ref('mv_aggregate_metrics_by_county') }}
+  {% if is_incremental() %}
+    WHERE period_id >= (SELECT COALESCE(MAX(period_id), 0) FROM {{ this }})
+  {% endif %}
   UNION ALL
   SELECT
     level, county, sub_county, period_id, period_label, metric_id, value, last_updated
@@ -102,12 +108,27 @@ sub_county_base AS (
     value::NUMERIC AS value,
     last_updated
   FROM {{ ref('mv_aggregate_metrics_by_sub_county') }}
+  {% if is_incremental() %}
+    WHERE period_id >= (SELECT COALESCE(MAX(period_id), 0) FROM {{ this }})
+  {% endif %}
 ),
 
 base AS (
   SELECT * FROM county_base_plus
   UNION ALL
   SELECT * FROM sub_county_base
+),
+
+-- To identify metrics whose denominator is a numeric constant
+denom_const AS (
+  SELECT
+    m.metric_id,
+    CASE
+      WHEN m.denominator_metric_id ~ '^[0-9]+(\.[0-9]+)?$'
+      THEN m.denominator_metric_id::numeric
+      ELSE NULL::numeric
+    END AS denom_constant
+  FROM metrics_map m
 ),
 
 num_sums AS (
@@ -126,6 +147,7 @@ num_sums AS (
   GROUP BY 1,2,3,4,5,6
 ),
 
+-- Only pull denominator rows from base when denominator is NOT numeric
 den_sums AS (
   SELECT
     m.metric_id,
@@ -138,6 +160,7 @@ den_sums AS (
   FROM metrics_map m
   JOIN base b
     ON b.metric_id = LOWER(m.denominator_metric_id)
+  WHERE m.denominator_metric_id !~ '^[0-9]+(\.[0-9]+)?$'
   GROUP BY 1,2,3,4,5,6
 ),
 
@@ -150,14 +173,17 @@ computed AS (
     ns.period_label,
     ns.metric_id,
     ns.numerator_metric_id AS numerator_id,
-    ds.denominator_metric_id AS denominator_id,
+    mm.denominator_metric_id AS denominator_id,
     ROUND(
-      COALESCE(MAX(ns.numerator_value),0)::NUMERIC
-      / NULLIF(COALESCE(MAX(ds.denominator_value),0)::NUMERIC, 0)
+      COALESCE(MAX(ns.numerator_value), 0)::numeric
+      / NULLIF(
+          COALESCE(MAX(ds.denominator_value), MAX(dc.denom_constant), 0)::numeric,
+          0
+        )
       * mm.scale_factor
     , mm.round_to) AS value,
     MAX(ns.numerator_value) AS numerator,
-    MAX(ds.denominator_value) AS denominator,
+    COALESCE(MAX(ds.denominator_value), MAX(dc.denom_constant)) AS denominator,
     GREATEST(
       MAX(COALESCE(b.last_updated, NOW())),
       NOW()
@@ -171,6 +197,8 @@ computed AS (
    AND ds.period_id  = ns.period_id
   JOIN metrics_map mm
     ON mm.metric_id  = ns.metric_id
+  LEFT JOIN denom_const dc
+    ON dc.metric_id = ns.metric_id
   LEFT JOIN base b
     ON b.level       = ns.level
    AND b.county      = ns.county
@@ -202,3 +230,4 @@ final AS (
 )
 
 SELECT * FROM final
+ORDER BY metric_id, period_id;
