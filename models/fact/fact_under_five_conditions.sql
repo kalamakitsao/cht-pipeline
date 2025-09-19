@@ -15,7 +15,10 @@ WITH base AS (
     e.has_diarrhoea,
     e.has_fever,
     e.has_pneumonia,
-    e.has_malnutrition,
+    case when e.muac_color in ('red', 'yellow') then true 
+	      when e.muac_color = 'green' then false
+	      else null
+        end as has_malnutrition,
     e.has_malaria,
     e.referred_for_development_milestones,
     e.has_been_referred,
@@ -82,7 +85,7 @@ agg AS (
     location_id,
     period_id,
     metric_id,
-    COUNT(DISTINCT patient_id) AS value
+    COUNT(patient_id) AS value
   FROM dated
   WHERE metric_id IS NOT NULL
   GROUP BY 1,2,3
