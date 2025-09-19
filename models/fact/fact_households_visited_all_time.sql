@@ -13,7 +13,7 @@ WITH base AS (
     hv.household          AS household_id
   FROM {{ source(env_var('POSTGRES_SCHEMA'), 'household_visit') }} hv
     JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'household') }} h on hv.household = h.uuid
-    LEFT JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'contact') }} c ON hv.household = c.contact_id and c.contact_type = 'e_household'
+    LEFT JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'contact') }} c ON hv.household = c.uuid and c.contact_type = 'e_household'
   WHERE hv.household IS NOT NULL and c.muted is null
 ),
 dated AS (
