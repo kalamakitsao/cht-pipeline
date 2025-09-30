@@ -12,9 +12,9 @@ WITH base AS (
     hv.reported::date     AS visit_date,
     hv.household          AS household_id
   FROM {{ source(env_var('POSTGRES_SCHEMA'), 'household_visit') }} hv
-    JOIN {{ ref('household') }} h on hv.household = h.uuid
+    JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'household') }} h on hv.household = h.uuid
     JOIN {{ ref('mv_location_hierarchy') }} chps on hv.reported_by_parent = chps.chp_area_id
-    JOIN {{ ref('contact') }} c ON hv.household = c.uuid and c.contact_type = 'e_household'
+    JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'contact') }} c ON hv.household = c.uuid and c.contact_type = 'e_household'
   WHERE hv.household IS NOT NULL and c.muted is null
 ),
 dated AS (
