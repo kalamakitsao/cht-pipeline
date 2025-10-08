@@ -10,6 +10,7 @@
 WITH chps AS (
     SELECT location_id
     FROM {{ ref('dim_location') }}
+        JOIN {{ ref('mv_location_hierarchy') }} lh ON lh.chp_area_id = dim_location.location_id
     WHERE level = 'chp area'
 ),
 

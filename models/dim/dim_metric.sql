@@ -12,20 +12,20 @@ SELECT *
 FROM (
     VALUES
         -- Child Health: Assessments and ICCM
-        ('u5_assessed', 'Total U5 Population Assessed', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
-        ('u5_assessed_diarrhoea', 'Total U5 Population Assessed for Diarrhoea', 'Child Health (<5 years)', 'Children under 5 assessed for Diarrhoea during the period', 'count', 'child_health'),
-        ('u5_assessed_diarrhoea_male', 'Total U5 Population Assessed for Diarrhoea', 'Child Health (<5 years)', 'Children under 5 assessed for Diarrhoea during the period', 'count', 'child_health'),
-        ('u5_assessed_diarrhoea_female', 'Total U5 Population Assessed for Diarrhoea', 'Child Health (<5 years)', 'Children under 5 assessed for Diarrhoea during the period', 'count', 'child_health'),
-        ('u5_assessed_pneumonia', 'Total U5 Population Assessed for pneumonia', 'Child Health (<5 years)', 'Children under 5 assessed for Pneumonia during the period', 'count', 'child_health'),
-        ('u5_assessed_pneumonia_male', 'Total U5 Population Assessed for pneumonia', 'Child Health (<5 years)', 'Children under 5 assessed for Pneumonia during the period', 'count', 'child_health'),
-        ('u5_assessed_pneumonia_female', 'Total U5 Population Assessed for pneumonia', 'Child Health (<5 years)', 'Children under 5 assessed for Pneumonia during the period', 'count', 'child_health'),
-        ('u5_assessed_malaria', 'Total U5 Population Assessed for malaria', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
-        ('u5_assessed_malaria_male', 'Total U5 Population Assessed for malaria', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
-        ('u5_assessed_malaria_female', 'Total U5 Population Assessed for malaria', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
-        ('u5_assessed_malnutrition', 'Total U5 Population Assessed for malnutrition', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
-        ('u5_assessed_malnutrition_male', 'Total U5 Population Assessed for malnutrition', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
-        ('u5_assessed_malnutrition_female', 'Total U5 Population Assessed for malnutrition', 'Child Health (<5 years)', 'Children under 5 assessed during the period', 'count', 'child_health'),
-        ('u5_assessed_exclusive_breastfeeding', 'Under 6 months Assessed for exclusive breastfeeding', 'Child Health (<5 years)', 'Children under 6 months Assessed for exclusive breastfeeding', 'count', 'child_health'),
+        ('u5_assessed', 'Total U5 Population Assessments', 'Child Health (<5 years)', 'Assessments conducted on children below 5 years during the period', 'count', 'child_health'),
+        ('u5_assessed_diarrhoea', 'Total U5 Population Assessments for Diarrhoea', 'Child Health (<5 years)', 'Assessments on Children under 5 for Diarrhoea during the period', 'count', 'child_health'),
+        ('u5_assessed_diarrhoea_male', 'Total U5 Male Population assessments for Diarrhoea', 'Child Health (<5 years)', 'Assessments on male Children under 5 for Diarrhoea during the period', 'count', 'child_health'),
+        ('u5_assessed_diarrhoea_female', 'Total U5 Female Population assessments for Diarrhoea', 'Child Health (<5 years)', 'Assessments on female Children under 5 for Diarrhoea during the period', 'count', 'child_health'),
+        ('u5_assessed_pneumonia', 'Total U5 Population assessments for pneumonia', 'Child Health (<5 years)', 'Assessments on Children under 5 for danger signs related to pneumonia during the period', 'count', 'child_health'),
+        ('u5_assessed_pneumonia_male', 'Total U5 Male Population assessments for pneumonia', 'Child Health (<5 years)', 'Assessments on male Children under 5 for danger signs related to pneumonia during the period', 'count', 'child_health'),
+        ('u5_assessed_pneumonia_female', 'Total U5 Female Population assessments for pneumonia', 'Child Health (<5 years)', 'Assessments on female Children under 5 for danger signs related to pneumonia during the period', 'count', 'child_health'),
+        ('u5_assessed_malaria', 'Total U5 Population assessments for malaria', 'Child Health (<5 years)', 'Assessments on Children under 5 for danger signs related to malaria during the period', 'count', 'child_health'),
+        ('u5_assessed_malaria_male', 'Total U5 Male Population assessments for malaria', 'Child Health (<5 years)', 'Assessments on male Children under 5 for danger signs related to malaria during the period', 'count', 'child_health'),
+        ('u5_assessed_malaria_female', 'Total U5 Female Population assessments for malaria', 'Child Health (<5 years)', 'Assessments on female Children under 5 for danger signs related to malaria during the period', 'child_health'),
+        ('u5_assessed_malnutrition', 'Total U5 Population assessments for malnutrition', 'Child Health (<5 years)', 'Assessments on Children under 5 for danger signs related to malnutrition during the period', 'count', 'child_health'),
+        ('u5_assessed_malnutrition_male', 'Total U5 Male Population assessments for malnutrition', 'Child Health (<5 years)', 'Assessments on male Children under 5 for danger signs related to malnutrition during the period', 'count', 'child_health'),
+        ('u5_assessed_malnutrition_female', 'Total U5 Female Population assessments for malnutrition', 'Child Health (<5 years)', 'Assessments on female Children under 5 for danger signs related to malnutrition during the period', 'count', 'child_health'),
+        ('u5_assessed_exclusive_breastfeeding', 'Under 6 months assessments for exclusive breastfeeding', 'Child Health (<5 years)', 'Children under 6 months Assessed for exclusive breastfeeding', 'count', 'child_health'),
         ('u5_exclusive_breastfeeding', 'Under 6 months exclusive breastfeeding', 'Child Health (<5 years)', 'Children under 6 months on exclusive breastfeeding', 'count', 'child_health'),
         
 
@@ -35,28 +35,28 @@ FROM (
         ('u5_malnutrition_male', 'Male U5 Malnutrition Cases', 'Child Health (<5 years)', 'Suspected malnutrition in male children under 5', 'count', 'child_health'),
         ('u5_malnutrition_female', 'Female U5 Malnutrition Cases', 'Child Health (<5 years)', 'Suspected malnutrition in female children under 5', 'count', 'child_health'),
         ('u5_tested_malaria', 'U5 Malaria Tests', 'Child Health (<5 years)', 'Malaria tests done on children under 5', 'count', 'child_health'),
-        ('u5_confirmed_malaria_cases', 'Confirmed U5 Malaria Cases', 'Child Health (<5 years)', 'Confirmed malaria in children under 5', 'count', 'child_health'),
-        ('u5_suspected_malaria_cases', 'Suspected U5 Malaria Cases', 'Child Health (<5 years)', 'Suspected malaria in children under 5', 'count', 'child_health'),
-        ('u5_treated_malaria', 'Treated for Malaria', 'Child Health (<5 years)', 'Children treated for malaria', 'count', 'child_health'),
-        ('u5_treated_pneumonia', 'Treated for Pneumonia', 'Child Health (<5 years)', 'Children treated for pneumonia', 'count', 'child_health'),
-        ('u5_treated_diarrhoea', 'Treated for Diarrhoea', 'Child Health (<5 years)', 'Children treated for diarrhoea', 'count', 'child_health'),
-        ('referred_for_malaria', 'Referred for Malaria', 'Child Health (<5 years)', 'Children referred for malaria treatment', 'count', 'child_health'),
-        ('referred_for_pneumonia', 'Referred for Pneumonia', 'Child Health (<5 years)', 'Children referred for pneumonia treatment', 'count', 'child_health'),
-        ('referred_for_malnutrition', 'Referred for Malnutrition', 'Child Health (<5 years)', 'Children referred for malnutrition', 'count', 'child_health'),
-        ('referred_for_diarrhoea', 'Referred for Diarrhoea', 'Child Health (<5 years)', 'Children referred for diarrhoea treatment', 'count', 'child_health'),
-        ('u5_referred', 'Under 5 Referred', 'Child Health (<5 years)', 'Children Referred for Further Assessment', 'count', 'child_health'),
-        ('u5_referred_male', 'Under 5 Referred Male', 'Male Child Health (<5 years)', 'Children Referred for Further Assessment', 'count', 'child_health'),
-        ('u5_referred_female', 'Under 5 Referred Female', 'Female Child Health (<5 years)', 'Children Referred for Further Assessment', 'count', 'child_health'),
+        ('u5_confirmed_malaria_cases', 'Confirmed U5 Malaria Cases', 'Child Health (<5 years)', 'RDT Tests conducted malaria in children under 5 returning a positive results', 'count', 'child_health'),
+        ('u5_suspected_malaria_cases', 'Suspected U5 Malaria Cases', 'Child Health (<5 years)', 'Assessments with children having malaria related danger signs', 'count', 'child_health'),
+        ('u5_treated_malaria', 'Treated for Malaria', 'Child Health (<5 years)', 'Identified or suspected malaria cases that the CHPs treated with AL', 'count', 'child_health'),
+        ('u5_treated_pneumonia', 'Treated for Pneumonia', 'Child Health (<5 years)', 'Suspected pneumonia cases where Children were treated with Amoxyl by the CHPs', 'count', 'child_health'),
+        ('u5_treated_diarrhoea', 'Treated for Diarrhoea', 'Child Health (<5 years)', 'Cases of Children with diarrhoea which were managed with Zinc/ORS by CHPs', 'count', 'child_health'),
+        ('referred_for_malaria', 'Referred for Malaria', 'Child Health (<5 years)', 'Cases of children with malaria sysmptoms who were referred for further assessment/treatment', 'count', 'child_health'),
+        ('referred_for_pneumonia', 'Referred for Pneumonia', 'Child Health (<5 years)', 'Cases of children with Pneumonia sysmptoms who were referred for further assessment/treatment', 'count', 'child_health'),
+        ('referred_for_malnutrition', 'Referred for Malnutrition', 'Child Health (<5 years)', 'Cases of children with malnutriotion who were referred for further assessment/treatment', 'count', 'child_health'),
+        ('referred_for_diarrhoea', 'Referred for Diarrhoea', 'Child Health (<5 years)', 'Cases of children with diarrhoea who were referred for further assessment/treatment', 'count', 'child_health'),
+        ('u5_referred', 'Under 5 Referred', 'Child Health (<5 years)', 'Cases of Children with danger signs who were referred for Further Assessment', 'count', 'child_health'),
+        ('u5_referred_male', 'Under 5 Referred Male', 'Male Child Health (<5 years)', 'Cases of male Children with danger signs who were referred for Further Assessment', 'count', 'child_health'),
+        ('u5_referred_female', 'Under 5 Referred Female', 'Female Child Health (<5 years)', 'Cases of female Children with danger signs who were referred for Further Assessment', 'count', 'child_health'),
         ('needs_deworming_follow_up_male', 'Male Children Needing Deworming', 'Child Health (<5 years)', 'Male children needing follow-up deworming', 'count', 'child_health'),
         ('needs_deworming_follow_up_female', 'Female Children Needing Deworming', 'Child Health (<5 years)', 'Female children needing follow-up deworming', 'count', 'child_health'),
 
 
         -- Pregnancy-related
-        ('currently_pregnant', 'Current Pregnant Women', 'Maternal Health Services', 'Number of pregnant women within the period', 'count','maternal_health'),
+        ('currently_pregnant', 'Current Pregnant Women', 'Maternal Health Services', 'Number of active pregnant women within the period', 'count','maternal_health'),
         ('new_pregnancies', 'Newly Registered Pregnant Women', 'Maternal Health Services', 'Number of newly registered pregnant women within the period', 'count','maternal_health'),
-        ('teen_pregnancies', 'Teen Pregnancies (10-19)', 'Maternal Health Services', 'Number of pregnant women aged 10-19 within the period', 'count','maternal_health'),
+        ('teen_pregnancies', 'Teen Pregnancies (10-19)', 'Maternal Health Services', 'Number of active pregnant women aged 10-19 within the period', 'count','maternal_health'),
         ('new_teen_pregnancies', 'New Teen Pregnancies (10-19)', 'Maternal Health Services', 'Newly identified pregnancies among women aged 10–19', 'count','maternal_health'),
-        ('pregnant_women_visited', 'Pregnant Women Visited', 'Maternal Health Services', 'Number of pregnant women visited during the period', 'count','maternal_health'),
+        ('pregnant_women_visited', 'Pregnant Women Visited', 'Maternal Health Services', 'Number of pregnant women who had at least one pregnancy home visit form submitted during the period', 'count','maternal_health'),
         ('pregnant_women_referred', 'Pregnant Women Referred (Any Reason)', 'Maternal Health Services', 'Pregnant women referred during the period for any reason', 'count','maternal_health'),
         ('pregnant_women_referred_missed_anc', 'Pregnant Women Referred for Missed ANC', 'Maternal Health Services', 'Pregnant women referred due to missed ANC visit', 'count','maternal_health'),
         ('new_pregnant_women_referred_anc', 'New Pregnant Women Referred for ANC', 'Maternal Health Services', 'Newly identified pregnant women referred for ANC', 'count','maternal_health'),
@@ -68,8 +68,8 @@ FROM (
         ('actively_pregnant_women', 'Actively Pregnant Women (EDD-based)', 'Maternal Health Services', 'Estimated number of women actively pregnant during the period based on EDD window', 'count','maternal_health'),
        
         -- Newborn and PNC
-        ('deliveries', 'Total Deliveries', 'Maternal Health Services', 'Number of new deliveries that took place', 'count', 'maternal_health'),
-        ('newborns', 'Newborns', 'Maternal Health Services', 'Number of newborns born during the period', 'count', 'maternal_health'),
+        ('deliveries', 'Total Deliveries', 'Maternal Health Services', 'Number of new deliveries reported by CHPs during the period', 'count', 'maternal_health'),
+        ('newborns', 'Newborns', 'Maternal Health Services', 'Number of newborns registered during the period', 'count', 'maternal_health'),
         ('referred_for_pnc', 'Newborn Referred for PNC Services', 'Child Health (<5 years)', 'Newborns referred for postnatal care follow-up', 'count', 'child_health'),
         ('newborns_needing_follow_up', 'Newborns Needing Follow-up', 'Child Health (<5 years)', 'Newborns needing follow-up care', 'count', 'child_health'),
         ('newborns_needing_follow_up_danger_signs', 'Newborns Needing Follow-up for Danger Signs', 'Child Health (<5 years)', 'Newborns needing follow-up for danger signs', 'count', 'child_health'),
@@ -193,10 +193,10 @@ FROM (
         ('rate_echis_pop_coverage', 'Registered Population on eCHIS','CHP Service Delivery', 'Proportion of projected population registered by CHPs','proportion', 'chp_service_delivery'),
         ('rate_household_visit','Households visit rate','CHP Service Delivery', 'Household visit coverage rates by CHPs', 'proportion', 'chp_service_delivery'),
 
-        -- Monthly rates for dashboard
-        ('monthly_rates_active_chp', 'Monthly Active CHPs', 'CHP Service Delivery', 'Monthly active CHP trends', 'proportion', 'chp_service_delivery'),
-        ('monthly_rates_pop_coverage', 'Monthly People served','CHP Service Delivery', 'Monthly people served coverage rates', 'proportion', 'chp_service_delivery'),
-        ('monthly_rates_household_visit','Monthly Households visited', 'CHP Service Delivery', 'Monthly household visit coverage rates', 'proportion', 'chp_service_delivery')
+        -- Monthly percentages for dashboard
+        ('monthly_perc_active_chp', 'Monthly Active CHPs', 'CHP Service Delivery', 'Monthly active CHP trends', 'proportion', 'chp_service_delivery'),
+        ('monthly_perc_pop_coverage', 'Monthly People served','CHP Service Delivery', 'Monthly people served coverage rates', 'proportion', 'chp_service_delivery'),
+        ('monthly_perc_household_visit','Monthly Households visited', 'CHP Service Delivery', 'Monthly household visit coverage rates', 'proportion', 'chp_service_delivery')
 
 
 ) AS t(metric_id, name, group_name, description, unit, metric_group_id)
