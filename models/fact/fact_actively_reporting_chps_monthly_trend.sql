@@ -5,7 +5,7 @@
   on_schema_change = 'ignore'
 ) }}
 
-{% set min_ratio = var('active_min_ratio', 0.165) %}
+{% set min_ratio = var('active_min_ratio', 0.33) %}
 
 WITH denom AS (
   -- monthly registered households (NOT cumulative)
@@ -42,7 +42,7 @@ scored AS (
 SELECT
   location_id,
   period_start,
-  'active_chps_new' AS metric_id,
+  'active_chps' AS metric_id,
   1 AS value
 FROM scored
 WHERE is_active = 1
