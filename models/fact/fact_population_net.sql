@@ -8,20 +8,32 @@
   on_schema_change = 'ignore',
   indexes = [
     {"columns": ["period_id","location_id","metric_id"]},
-    {"columns": ["metric_id"]},
-    {"columns": ["location_id","period_id"]}
+    {"columns": ["location_id","period_id"]},
+    {"columns": ["metric_id"]}
   ]
 ) }}
 
-{# --- Pull population metrics and pivot once --- #}
-WITH pop_raw AS (
+{# -------------------------------------------------------------------------
+   Active periods window: keep compute + deletes to recent periods only
+   (match this to how “fresh” you want the population net metrics)
+   ------------------------------------------------------------------------- #}
+WITH active_periods AS (
+  SELECT period_id
+  FROM {{ ref('dim_period') }}
+  WHERE end_date >= CURRENT_DATE - interval '400 days'
+),
+
+{# --- Pull population metrics and pivot once, only for active periods --- #}
+pop_raw AS (
   SELECT
-    location_id,
-    period_id,
-    metric_id,
-    value::bigint AS value
-  FROM {{ ref('fact_population_registered') }}
-  WHERE metric_id IN (
+    f.location_id,
+    f.period_id,
+    f.metric_id,
+    f.value::bigint AS value
+  FROM {{ ref('fact_population_registered') }} f
+  JOIN active_periods ap
+    ON f.period_id = ap.period_id
+  WHERE f.metric_id IN (
     'population','population_male','population_female',
     'population_under_5','population_under_5_male','population_under_5_female'
   )
@@ -40,15 +52,17 @@ pop AS (
   GROUP BY location_id, period_id
 ),
 
-{# --- Pull death metrics and pivot once --- #}
+{# --- Pull death metrics and pivot once, only for active periods --- #}
 death_raw AS (
   SELECT
-    location_id,
-    period_id,
-    metric_id,
-    value::bigint AS value
-  FROM {{ ref('fact_death_metrics') }}
-  WHERE metric_id IN (
+    f.location_id,
+    f.period_id,
+    f.metric_id,
+    f.value::bigint AS value
+  FROM {{ ref('fact_death_metrics') }} f
+  JOIN active_periods ap
+    ON f.period_id = ap.period_id
+  WHERE f.metric_id IN (
     'total_deaths',
     'neonatal_deaths',
     'child_deaths','child_deaths_male','child_deaths_female',
@@ -139,10 +153,10 @@ SELECT
   value,
   CURRENT_TIMESTAMP AS last_updated
 FROM metrics
-WHERE value > 0
+WHERE value > 0;
 
 {% if is_incremental() %}
-  {# Recompute only recent/active periods; adjust window to your lateness #}
+  {# Recompute + delete only for active periods #}
   {% set preds = [
     "period_id IN (SELECT period_id FROM " ~ ref('dim_period') ~ " WHERE end_date >= CURRENT_DATE - interval '400 days')"
   ] %}
