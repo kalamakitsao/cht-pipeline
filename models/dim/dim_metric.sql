@@ -153,11 +153,10 @@ FROM (
         ('people_served', 'People Served', 'CHP Service Delivery', 'Individuals receiving services during the period', 'count', 'chp_service_delivery'),
         ('monthly_cu_meetings', 'Monthly CU Meetings', 'CHP Service Delivery', 'CHPs attending mandatory monthly meetings', 'count', 'chp_service_delivery'),
         ('other_community_events', 'Community Events Participation', 'CHP Service Delivery', 'CHP participation in community events', 'count', 'chp_service_delivery'),
-        ('revised_active_chps', 'Revised Active CHPs', 'CHP Service Delivery', 'CHPs scoring 80%+ across KPIs (visits, referrals etc.)', 'count', 'chp_service_delivery'),
         ('chps_enrolled', 'CHPs Enrolled in eCHIS', 'CHP Service Delivery', 'CHPs with eCHIS credentials and log-ins', 'count', 'chp_service_delivery'),
         ('chps_with_hholds', 'CHPs Who Registered Households', 'CHP Service Delivery', 'CHPs that enrolled at least one household', 'count', 'chp_service_delivery'),
         ('perc_active_chps', 'Proportion of Active CHPs', 'CHP Service Delivery', 'Percentage of CHPs actively providing services', 'count', 'chp_service_delivery'),
-        ('active_chps_new', 'CHPs Who Visited their requiered Household Target', 'CHP Service Delivery', 'CHPs who met their household visit targets', 'count', 'chp_service_delivery'),
+        ('active_chps', 'CHPs Who Visited their requiered Household Target', 'CHP Service Delivery', 'CHPs who met their household visit targets', 'count', 'chp_service_delivery'),
         ('chps_expected', 'CHPs expected to be working', 'CHP Service Delivery', 'CHPs who are expected to be reporting on eCHIS', 'count', 'chp_service_delivery'),
         ('is_reporting_chps', 'CHPs Who Submitted at least one report during the period', 'CHP Service Delivery', 'CHPs who submitted any report', 'count', 'chp_service_delivery'),
 
@@ -171,8 +170,6 @@ FROM (
         ('over_5_deaths_female', 'Over 5 deaths - Male', 'Birth and Death Reporting', 'Deaths of male children aged 29 days to 5 years', 'count','births_death_reporting'),
         ('over_5_deaths_male', 'Over 5 deaths - Male', 'Birth and Death Reporting', 'Deaths of male children aged 29 days to 5 years', 'count','births_death_reporting'),
         ('total_deaths', 'Total Deaths Reported', 'Birth and Death Reporting', 'Total deaths reported by CHPs', 'count','births_death_reporting'),
-
-
         -- SHA
         ('households_with_active_insurance', 'Households With Active Insurance Cover', 'Households and Population Registration', 'Number of households that have an active insurance cover', 'count','household_registration'),
         ('households_registered_on_sha', 'Households Registered on SHA', 'Households and Population Registration', 'Number of households registered with NHIF, SHIF, or SHA schemes', 'count','household_registration'),

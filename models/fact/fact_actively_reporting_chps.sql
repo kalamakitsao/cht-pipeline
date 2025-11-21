@@ -40,10 +40,8 @@ scored AS (
             WHEN v.hh_visited IS NULL THEN 0
             WHEN v.hh_visited::FLOAT / hr.households_registered > 0.33 
                 AND hr.period_id_name IN ('last_1_month','this_month', 'last_month') THEN 1
-            WHEN v.hh_visited::FLOAT / hr.households_registered > 0.90 
-                AND hr.period_id_name IN ('last_3_months','this_quarter', 'last_quarter') THEN 1
-            WHEN v.hh_visited::FLOAT / hr.households_registered > 0.90
-                AND hr.period_id_name IN ('last_6_months') THEN 1
+            WHEN v.hh_visited::FLOAT / hr.households_registered >= 1.0 
+                AND hr.period_id_name IN ('last_3_months','this_quarter', 'last_quarter','last_6_months', 'last_last_1_yr', 'all_time') THEN 1
             WHEN v.hh_visited::FLOAT > 0
                 AND hr.period_id_name IN ('today','yesterday', 'last_7_days', 'this_week') THEN 1
             ELSE 0
