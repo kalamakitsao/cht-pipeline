@@ -1,20 +1,21 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      {"columns": ["county", "period_start", "metric_id"], "unique": true},
+      {"columns": ["county_id", "period_start", "metric_id"], "unique": true},
       {"columns": ["metric_group"]}
     ],
     tags=['cadence_daily']
 ) }}
 WITH location_hierarchy AS (
     SELECT
-        chp_area_id,
+        county_id,
         county
     FROM {{ ref('mv_location_hierarchy') }}
 )
 
 SELECT
     'county' AS level,
+    lh.county_id,
     lh.county,
     fa.period_start,
     TO_CHAR(fa.period_start, 'FMMonth YYYY') AS month_year,
@@ -27,6 +28,7 @@ FROM {{ ref('fact_households_visited_monthly_trend') }} fa
 JOIN location_hierarchy lh ON lh.chp_area_id = fa.location_id
 JOIN {{ ref('dim_metric') }} dm ON dm.metric_id = fa.metric_id
 GROUP BY
+    lh.county_id,
     lh.county,
     fa.period_start,
     dm.group_name,

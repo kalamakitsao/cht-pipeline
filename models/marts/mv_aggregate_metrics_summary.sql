@@ -4,8 +4,8 @@
     materialized = 'table',
     indexes = [
       {"columns": ["location_id", "period_id", "metric_id"], "unique": true},
-      {"columns": ["chp_area"]},
-      {"columns": ["county"]},
+      {"columns": ["chp_area_id"]},
+      {"columns": ["county_id"]},
       {"columns": ["period_label"]},
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
@@ -18,8 +18,11 @@ WITH location_hierarchy AS (
     SELECT
         chp_area_id,
         chp_area,
+        community_unit_id,
         community_unit,
+        sub_county_id,
         sub_county,
+        county_id,
         county
     FROM {{ ref('mv_location_hierarchy') }}
 ),
@@ -34,9 +37,13 @@ aggregates AS (
 ),
 joined AS (
     SELECT
+        lh.chp_area_id,
         lh.chp_area,
+        lh.community_unit_id,
         lh.community_unit,
+        lh.sub_county_id,
         lh.sub_county,
+        lh.county_id,
         lh.county,
         dp.start_date AS period_start,
         dp.end_date AS period_end,
@@ -57,9 +64,13 @@ joined AS (
 )
 SELECT
     level,
+    chp_area_id,
     chp_area,
+    community_unit_id,
     community_unit,
+    sub_county_id,
     sub_county,
+    county_id,
     county,
     period_start,
     period_end,

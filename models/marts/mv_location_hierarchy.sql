@@ -4,9 +4,9 @@
     on_schema_change = 'ignore',
     indexes = [
         {'columns': ['chp_area_id'], 'unique': true},
-        {'columns': ['county']},
-        {'columns': ['sub_county']},
-        {'columns': ['community_unit']},
+        {'columns': ['county_id']},
+        {'columns': ['sub_county_id']},
+        {'columns': ['community_unit_id']},
         {'columns': ['chp_area']}
     ],
     tags=['cadence_hourly']
@@ -14,11 +14,14 @@
 
 WITH base AS (
     SELECT
+        county.location_id AS county_id,
         county.name AS county,
+        sub.location_id AS sub_county_id,
         sub.name AS sub_county,
+        chu.location_id AS community_unit_id,
         chu.name AS community_unit,
-        chp_area.name AS chp_area,
-        chp_area.location_id AS chp_area_id
+        chp_area.location_id AS chp_area_id,
+        chp_area.name AS chp_area
     FROM {{ ref('dim_location') }} chp_area
     LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp_area.parent_id
     LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
