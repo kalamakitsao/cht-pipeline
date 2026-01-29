@@ -9,6 +9,7 @@
 ) }}
 WITH location_hierarchy AS (
     SELECT
+        chp_area_id,
         county_id,
         county
     FROM {{ ref('mv_location_hierarchy') }}

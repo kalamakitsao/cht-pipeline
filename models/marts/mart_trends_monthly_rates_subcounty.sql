@@ -8,6 +8,7 @@
 WITH metrics_map AS (
   SELECT *
   FROM ( VALUES
+    ('monthly_rates_reporting_chp',   'is_reporting_chps',   'chps_enrolled',         1.0, 1),
     ('monthly_rates_active_chp',      'active_chps_new',     'chps_enrolled',          1.0, 1),
     ('monthly_rates_pop_coverage',    'people_served',       'people_registered',      1.0, 2),
     ('monthly_rates_household_visit', 'hh_visited',          'households_registered',  1.0, 2)
@@ -23,31 +24,31 @@ dim_metric_enriched AS (
 ),
 
 monthly_base AS (
-  SELECT LOWER(level) AS level, county, sub_county, period_start, month_year, LOWER(metric_id) AS metric_id, value::numeric AS value
+  SELECT LOWER(level) AS level, county_id, county, sub_county_id, sub_county, period_start, month_year, LOWER(metric_id) AS metric_id, value::numeric AS value
   FROM {{ ref('mart_household_regd_monthly_subcounty') }}
   UNION ALL
-  SELECT LOWER(level), county, sub_county, period_start, month_year, LOWER(metric_id), value::numeric
+  SELECT LOWER(level), county_id, county, sub_county_id, sub_county, period_start, month_year, LOWER(metric_id), value::numeric
   FROM {{ ref('mart_household_visit_monthly_subcounty') }}
 ),
 
 num_sums_std AS (
-  SELECT m.metric_id, b.level, b.county, b.sub_county, b.period_start, b.month_year, SUM(b.value) AS numerator_value
+  SELECT m.metric_id, b.level, b.county_id, b.county, b.sub_county_id, b.sub_county, b.period_start, b.month_year, SUM(b.value) AS numerator_value
   FROM metrics_map m 
   JOIN monthly_base b ON b.metric_id = LOWER(m.numerator_metric_id)
   WHERE m.metric_id IN ('monthly_rates_pop_coverage','monthly_rates_household_visit')
-  GROUP BY 1,2,3,4,5,6
+  GROUP BY 1,2,3,4,5,6,7,8
 ),
 
 den_sums_std AS (
-  SELECT m.metric_id, b.level, b.county, b.sub_county, b.period_start, b.month_year, SUM(b.value) AS denominator_value
+  SELECT m.metric_id, b.level, b.county_id, b.county, b.sub_county_id, b.sub_county, b.period_start, b.month_year, SUM(b.value) AS denominator_value
   FROM metrics_map m 
   JOIN monthly_base b ON b.metric_id = LOWER(m.denominator_metric_id)
   WHERE m.metric_id IN ('monthly_rates_pop_coverage','monthly_rates_household_visit')
-  GROUP BY 1,2,3,4,5,6
+  GROUP BY 1,2,3,4,5,6,7,8
 ),
 
 computed_std AS (
-  SELECT ns.level, ns.county, ns.sub_county, ns.period_start, ns.month_year, ns.metric_id,
+  SELECT ns.level, ns.county_id, ns.county, ns.sub_county_id, ns.sub_county, ns.period_start, ns.month_year, ns.metric_id,
          ROUND(
            COALESCE(ns.numerator_value,0)::numeric / NULLIF(COALESCE(ds.denominator_value,0)::numeric,0) 
            * mm.scale_factor, mm.round_to
@@ -56,7 +57,9 @@ computed_std AS (
   LEFT JOIN den_sums_std ds
     ON ds.metric_id   = ns.metric_id 
    AND ds.level       = ns.level 
+   AND ds.county_id   = ns.county_id
    AND ds.county      = ns.county
+   AND COALESCE(ds.sub_county_id,'')=COALESCE(ns.sub_county_id,'')
    AND COALESCE(ds.sub_county,'')=COALESCE(ns.sub_county,'')
    AND ds.period_start=ns.period_start 
    AND ds.month_year  = ns.month_year
@@ -64,19 +67,20 @@ computed_std AS (
 ),
 
 chp_activity AS (
-  SELECT LOWER(level) AS level, county, sub_county, period_start, month_year, LOWER(metric_id) AS metric_id, value::numeric AS value
+  SELECT LOWER(level) AS level, county_id, county, sub_county_id, sub_county, period_start, month_year, LOWER(metric_id) AS metric_id, value::numeric AS value
   FROM {{ ref('mart_chp_activity_monthly_subcounty') }}
 ),
 
 num_chp AS (
-  SELECT 'monthly_rates_active_chp'::text AS metric_id, a.level, a.county, a.sub_county, a.period_start, a.month_year, SUM(a.value) AS numerator_value
+  SELECT m.metric_id, a.level, a.county_id, a.county, a.sub_county_id, a.sub_county, a.period_start, a.month_year, SUM(a.value) AS numerator_value
   FROM chp_activity a
-  WHERE a.metric_id = 'active_chps_new'
-  GROUP BY 1,2,3,4,5,6
+  JOIN metrics_map m ON m.numerator_metric_id = a.metric_id
+  WHERE a.metric_id IN ('active_chps_new', 'is_reporting_chps')
+  GROUP BY 1,2,3,4,5,6,7,8
 ),
 
 den_chp AS (
-  SELECT county, sub_county, value::numeric AS chps_enrolled
+  SELECT county_id, county, sub_county_id, sub_county, value::numeric AS chps_enrolled
   FROM {{ ref('mv_aggregate_metrics_by_sub_county') }}
   WHERE metric_id = 'chps_enrolled' AND period_id = 1
 ),
@@ -91,7 +95,7 @@ computed_chp AS (
   JOIN den_chp d 
     ON LOWER(TRIM(d.county))=LOWER(TRIM(n.county)) 
    AND LOWER(TRIM(d.sub_county))=LOWER(TRIM(n.sub_county))
-  JOIN metrics_map mm ON mm.metric_id = 'monthly_rates_active_chp'
+  JOIN metrics_map mm ON mm.metric_id = n.metric_id
 ),
 
 computed AS (

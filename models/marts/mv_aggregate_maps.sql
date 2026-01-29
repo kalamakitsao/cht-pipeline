@@ -217,7 +217,7 @@ computed AS (
    AND b.county_id   = ns.county_id
    AND COALESCE(b.sub_county_id,'') = COALESCE(ns.sub_county_id,'')
    AND b.period_id   = ns.period_id
-  GROUP BY 1,2,3,4,5,6,7,8, mm.scale_factor, mm.round_to
+  GROUP BY 1,2,3,4,5,6,7,8,9, mm.scale_factor, mm.round_to
 ),
 
 final AS (

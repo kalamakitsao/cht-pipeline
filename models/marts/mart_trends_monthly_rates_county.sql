@@ -9,6 +9,7 @@ WITH metrics_map AS (
   SELECT *
   FROM (
     VALUES
+      ('monthly_rates_reporting_chp',   'is_reporting_chps',   'chps_enrolled',         1.0, 1),
       ('monthly_rates_active_chp',      'active_chps_new',     'chps_enrolled',          1.0, 1),
       ('monthly_rates_pop_coverage',    'people_served',       'people_registered',      1.0, 2),
       ('monthly_rates_household_visit', 'hh_visited',          'households_registered',  1.0, 2)
@@ -59,7 +60,7 @@ num_sums_std AS (
   JOIN monthly_base b
     ON b.metric_id = LOWER(m.numerator_metric_id)
   WHERE m.metric_id IN ('monthly_rates_pop_coverage','monthly_rates_household_visit')
-  GROUP BY 1,2,3,4,5
+  GROUP BY 1,2,3,4,5,6
 ),
 
 den_sums_std AS (
@@ -75,7 +76,7 @@ den_sums_std AS (
   JOIN monthly_base b
     ON b.metric_id = LOWER(m.denominator_metric_id)
   WHERE m.metric_id IN ('monthly_rates_pop_coverage','monthly_rates_household_visit')
-  GROUP BY 1,2,3,4,5
+  GROUP BY 1,2,3,4,5,6
 ),
 
 computed_std AS (
@@ -116,7 +117,7 @@ chp_activity AS (
 
 num_chp AS (
   SELECT
-    'monthly_rates_active_chp'::text AS metric_id,
+    m.metric_id,
     a.level,
     a.county_id,
     a.county,
@@ -124,8 +125,9 @@ num_chp AS (
     a.month_year,
     SUM(a.value) AS numerator_value
   FROM chp_activity a
-  WHERE a.metric_id = 'active_chps_new'
-  GROUP BY 1,2,3,4,5
+  JOIN metrics_map m ON m.numerator_metric_id = a.metric_id
+  WHERE a.metric_id IN ('active_chps_new', 'is_reporting_chps')
+  GROUP BY 1,2,3,4,5,6
 ),
 
 den_chp AS (
@@ -154,7 +156,7 @@ computed_chp AS (
   JOIN den_chp d
     ON LOWER(TRIM(d.county)) = LOWER(TRIM(n.county))
   JOIN metrics_map mm
-    ON mm.metric_id = 'monthly_rates_active_chp'
+    ON mm.metric_id = n.metric_id
 ),
 
 computed AS (

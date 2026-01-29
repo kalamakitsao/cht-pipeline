@@ -95,13 +95,14 @@ chp_activity AS (
 ),
 
 num_chp AS (
-  SELECT 'monthly_rates_active_chp'::text AS metric_id,
+  SELECT m.metric_id,
          a.level,
          a.period_start,
          a.month_year,
          SUM(a.value) AS numerator_value
   FROM chp_activity a
-  WHERE a.metric_id = 'active_chps_new'
+  JOIN metrics_map m ON m.numerator_metric_id = a.metric_id
+  WHERE a.metric_id IN ('active_chps_new', 'is_reporting_chps')
   GROUP BY 1,2,3,4
 ),
 
@@ -123,8 +124,7 @@ computed_chp AS (
            * mm.scale_factor
          , mm.round_to) AS value
   FROM num_chp n
-  CROSS JOIN metrics_map mm
-  WHERE mm.metric_id = 'monthly_rates_active_chp'
+  JOIN metrics_map mm ON mm.metric_id = n.metric_id
 ),
 
 computed AS (

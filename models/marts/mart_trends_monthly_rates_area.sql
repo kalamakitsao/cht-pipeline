@@ -67,10 +67,11 @@ chp_activity AS (
 ),
 
 num_chp AS (
-  SELECT 'monthly_rates_active_chp'::text AS metric_id, a.level, a.county_id, a.county, a.sub_county_id, a.sub_county, a.community_unit_id, a.community_unit, a.chp_area_id, a.chp_area, a.period_start, a.month_year,
+  SELECT m.metric_id, a.level, a.county_id, a.county, a.sub_county_id, a.sub_county, a.community_unit_id, a.community_unit, a.chp_area_id, a.chp_area, a.period_start, a.month_year,
          SUM(a.value) AS numerator_value
   FROM chp_activity a
-  WHERE a.metric_id = 'active_chps_new'
+  JOIN metrics_map m ON m.numerator_metric_id = a.metric_id
+  WHERE a.metric_id IN ('active_chps_new', 'is_reporting_chps')
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 
@@ -89,7 +90,7 @@ computed_chp AS (
                 AND LOWER(TRIM(d.sub_county))=LOWER(TRIM(n.sub_county))
                 AND LOWER(TRIM(d.community_unit))=LOWER(TRIM(n.community_unit))
                 AND LOWER(TRIM(d.chp_area))=LOWER(TRIM(n.chp_area))
-  JOIN metrics_map mm ON mm.metric_id = 'monthly_rates_active_chp'
+  JOIN metrics_map mm ON mm.metric_id = n.metric_id
 ),
 
 computed AS (
