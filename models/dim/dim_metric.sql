@@ -156,9 +156,9 @@ FROM (
         ('chps_enrolled', 'CHPs Enrolled in eCHIS', 'CHP Service Delivery', 'CHPs with eCHIS credentials and log-ins', 'count', 'chp_service_delivery'),
         ('chps_with_hholds', 'CHPs Who Registered Households', 'CHP Service Delivery', 'CHPs that enrolled at least one household', 'count', 'chp_service_delivery'),
         ('perc_active_chps', 'Proportion of Active CHPs', 'CHP Service Delivery', 'Percentage of CHPs actively providing services', 'count', 'chp_service_delivery'),
-        ('active_chps', 'CHPs Who Visited their requiered Household Target', 'CHP Service Delivery', 'CHPs who met their household visit targets', 'count', 'chp_service_delivery'),
+        ('chps_meeting_target', 'CHPs Who Visited their requiered Household Target', 'CHP Service Delivery', 'CHPs who met their household visit targets', 'count', 'chp_service_delivery'),
         ('chps_expected', 'CHPs expected to be working', 'CHP Service Delivery', 'CHPs who are expected to be reporting on eCHIS', 'count', 'chp_service_delivery'),
-        ('is_reporting_chps', 'CHPs Who Submitted at least one report during the period', 'CHP Service Delivery', 'CHPs who submitted any report', 'count', 'chp_service_delivery'),
+        ('chps_reporting', 'CHPs Who Submitted at least one report during the period', 'CHP Service Delivery', 'CHPs who submitted any report', 'count', 'chp_service_delivery'),
 
         -- Referral & Death Reporting
         ('total_referrals', 'Total Referrals', 'Referrals', 'Individuals referred by CHPs across all age groups', 'count', 'referrals'),
@@ -186,7 +186,8 @@ FROM (
         ('rate_mental_health_referral', 'Mental Health referral rates', 'NCDs (Chronic Illnesses)', 'Proportion of people screened for mental health that were referred for further assessment', 'proportion', 'ncds'),
         ('rate_hypertension_referral', 'Hypertension referral rates', 'NCDs (Chronic Illnesses)', 'Proportion of people screened for hypertension that were referred for further assessment', 'proportion', 'ncds'),
         ('rate_diabetes_referral','Diabetes referral rates','NCDs (Chronic Illnesses)', 'Proportion of people screened for diabetes that were referred for further assessment', 'proportion', 'ncds'),
-        ('rate_active_chps', 'Active CHPs','CHP Service Delivery', 'CHPs who met the performance target', 'proportion', 'chp_service_delivery'),
+        ('monthly_rates_reporting_chp', 'CHPs Reporting Rate', 'CHP Service Delivery', 'Proportion of CHPs who submitted at least one report during the period', 'proportion', 'chp_service_delivery'),
+        ('monthly_rates_active_chp', 'Active CHPs Rate', 'CHP Service Delivery', 'Proportion of CHPs who met their household visit targets', 'proportion', 'chp_service_delivery'),
         ('rate_echis_pop_coverage', 'Registered Population on eCHIS','CHP Service Delivery', 'Proportion of projected population registered by CHPs','proportion', 'chp_service_delivery'),
         ('rate_household_visit','Households visit rate','CHP Service Delivery', 'Household visit coverage rates by CHPs', 'proportion', 'chp_service_delivery'),
 

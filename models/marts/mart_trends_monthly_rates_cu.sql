@@ -8,8 +8,8 @@
 WITH metrics_map AS (
   SELECT *
   FROM ( VALUES
-    ('monthly_rates_reporting_chp',   'is_reporting_chps',   'chps_enrolled',          1.0, 1),
-    ('monthly_rates_active_chp',      'active_chps_new',     'chps_enrolled',          1.0, 1),
+    ('monthly_rates_reporting_chp',   'chps_reporting',      'chps_enrolled',          1.0, 1),
+    ('monthly_rates_active_chp',      'chps_meeting_target', 'chps_enrolled',          1.0, 1),
     ('monthly_rates_pop_coverage',    'people_served',       'people_registered',      1.0, 2),
     ('monthly_rates_household_visit', 'hh_visited',          'households_registered',  1.0, 2)
   ) AS t(metric_id, numerator_metric_id, denominator_metric_id, scale_factor, round_to)
@@ -63,7 +63,7 @@ num_chp AS (
   SELECT m.metric_id, a.level, a.county_id, a.county, a.sub_county_id, a.sub_county, a.community_unit_id, a.community_unit, a.period_start, a.month_year, SUM(a.value) AS numerator_value
   FROM chp_activity a
   JOIN metrics_map m ON m.numerator_metric_id = a.metric_id
-  WHERE a.metric_id IN ('active_chps_new', 'is_reporting_chps')
+  WHERE a.metric_id IN ('chps_meeting_target', 'chps_reporting')
   GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 

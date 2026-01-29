@@ -54,7 +54,7 @@ scored AS (
 SELECT
     location_id,
     period_id,
-    'active_chps' AS metric_id,
+    'chps_meeting_target' AS metric_id,
     1 AS value,
     CURRENT_TIMESTAMP AS last_updated
 FROM scored
@@ -65,7 +65,7 @@ UNION ALL
 SELECT
     location_id,
     period_id,
-    'is_reporting_chps' AS metric_id,
+    'chps_reporting' AS metric_id,
     1 AS value,
     CURRENT_TIMESTAMP AS last_updated
 FROM hh_visits
