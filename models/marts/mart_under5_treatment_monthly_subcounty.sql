@@ -4,11 +4,13 @@
       {"columns": ["sub_county_id", "period_start", "metric_id"], "unique": true},
       {"columns": ["metric_group"]}
     ],
+    on_schema_change = 'append_new_columns',
     tags=['cadence_daily']
 ) }}
 
 WITH location_hierarchy AS (
     SELECT
+        chp_area_id,
         sub_county_id,
         sub_county,
         county_id,

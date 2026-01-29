@@ -1,7 +1,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = 'chp_area_id',
-    on_schema_change = 'ignore',
+    on_schema_change = 'append_new_columns',
     indexes = [
         {'columns': ['chp_area_id'], 'unique': true},
         {'columns': ['county_id']},

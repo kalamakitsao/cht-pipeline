@@ -1,7 +1,7 @@
 {{ config(
   materialized = 'table',
-  unique_key   = ['level','county','period_start','metric_id'],
-  on_schema_change = 'ignore',
+  unique_key   = ['level','county_id','county','period_start','metric_id'],
+  on_schema_change = 'append_new_columns',
   tags = ['trends','monthly','county','api']
 ) }}
 
@@ -27,6 +27,7 @@ dim_metric_enriched AS (
 monthly_base AS (
   SELECT
     LOWER(level)     AS level,
+    county_id,
     county,
     period_start,
     month_year,
@@ -36,6 +37,7 @@ monthly_base AS (
   UNION ALL
   SELECT
     LOWER(level)     AS level,
+    county_id,
     county,
     period_start,
     month_year,
@@ -48,6 +50,7 @@ num_sums_std AS (
   SELECT
     m.metric_id,
     b.level,
+    b.county_id,
     b.county,
     b.period_start,
     b.month_year,
@@ -63,6 +66,7 @@ den_sums_std AS (
   SELECT
     m.metric_id,
     b.level,
+    b.county_id,
     b.county,
     b.period_start,
     b.month_year,
@@ -77,6 +81,7 @@ den_sums_std AS (
 computed_std AS (
   SELECT
     ns.level,
+    ns.county_id,
     ns.county,
     ns.period_start,
     ns.month_year,
@@ -90,7 +95,7 @@ computed_std AS (
   LEFT JOIN den_sums_std ds
     ON ds.metric_id    = ns.metric_id
    AND ds.level        = ns.level
-   AND ds.county       = ns.county
+   AND ds.county_id    = ns.county_id
    AND ds.period_start = ns.period_start
    AND ds.month_year   = ns.month_year
   JOIN metrics_map mm
@@ -100,6 +105,7 @@ computed_std AS (
 chp_activity AS (
   SELECT
     LOWER(level)     AS level,
+    county_id,
     county,
     period_start,
     month_year,
@@ -112,6 +118,7 @@ num_chp AS (
   SELECT
     'monthly_rates_active_chp'::text AS metric_id,
     a.level,
+    a.county_id,
     a.county,
     a.period_start,
     a.month_year,
@@ -123,6 +130,7 @@ num_chp AS (
 
 den_chp AS (
   SELECT
+    county_id,
     county,
     value::NUMERIC AS chps_enrolled
   FROM {{ ref('mv_aggregate_metrics_by_county') }}
@@ -132,6 +140,7 @@ den_chp AS (
 computed_chp AS (
   SELECT
     n.level,
+    n.county_id,
     n.county,
     n.period_start,
     n.month_year,
@@ -156,6 +165,7 @@ computed AS (
 
 SELECT
   c.level,
+  c.county_id,
   c.county,
   c.period_start,
   c.month_year,

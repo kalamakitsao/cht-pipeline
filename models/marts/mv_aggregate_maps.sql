@@ -1,7 +1,7 @@
 {{ config(
   materialized = 'table',
-  unique_key   = ['level','county','sub_county','period_id','metric_id'],
-  on_schema_change = 'ignore',
+  unique_key   = ['level','county_id','county','sub_county_id','sub_county','period_id','metric_id'],
+  on_schema_change = 'append_new_columns',
   tags = ['maps','metrics','api']
 ) }}
 
@@ -36,6 +36,7 @@ dim_metric_enriched AS (
 county_periods AS (
   SELECT
     LOWER(level) AS level,
+    county_id,
     county,
     period_id,
     period_label
@@ -43,13 +44,14 @@ county_periods AS (
   {% if is_incremental() %}
     WHERE period_id >= (SELECT COALESCE(MAX(period_id), 0) FROM {{ this }})
   {% endif %}
-  GROUP BY 1,2,3,4
+  GROUP BY 1,2,3,4,5
 ),
 
 popn_closest AS (
   SELECT county, projection
   FROM (
     SELECT
+      p.county_id,
       p.county,
       p.population::numeric AS projection,
       p.year::int AS yr,
@@ -65,7 +67,9 @@ popn_closest AS (
 popn_rows AS (
   SELECT
     'county'::text AS level,
+    cp.county_id,
     cp.county,
+    NULL::text AS sub_county_id,
     NULL::text AS sub_county,
     cp.period_id,
     cp.period_label,
@@ -80,7 +84,9 @@ popn_rows AS (
 county_base_plus AS (
   SELECT
     LOWER(level) AS level,
+    county_id,
     county,
+    NULL::TEXT AS sub_county_id,
     NULL::TEXT AS sub_county,
     period_id,
     period_label,
@@ -93,14 +99,16 @@ county_base_plus AS (
   {% endif %}
   UNION ALL
   SELECT
-    level, county, sub_county, period_id, period_label, metric_id, value, last_updated
+    level, county_id, county, sub_county_id, sub_county, period_id, period_label, metric_id, value, last_updated
   FROM popn_rows
 ),
 
 sub_county_base AS (
   SELECT
     LOWER(level) AS level,
+    county_id,
     county,
+    sub_county_id,
     sub_county,
     period_id,
     period_label,
@@ -136,7 +144,9 @@ num_sums AS (
     m.metric_id,
     m.numerator_metric_id,
     b.level,
+    b.county_id,
     b.county,
+    b.sub_county_id,
     b.sub_county,
     b.period_id,
     MAX(b.period_label) AS period_label,
@@ -144,7 +154,7 @@ num_sums AS (
   FROM metrics_map m
   JOIN base b
     ON b.metric_id = LOWER(m.numerator_metric_id)
-  GROUP BY 1,2,3,4,5,6
+  GROUP BY 1,2,3,4,5,6,7,8
 ),
 
 -- Only pull denominator rows from base when denominator is NOT numeric
@@ -153,7 +163,9 @@ den_sums AS (
     m.metric_id,
     m.denominator_metric_id,
     b.level,
+    b.county_id,
     b.county,
+    b.sub_county_id,
     b.sub_county,
     b.period_id,
     SUM(b.value) AS denominator_value
@@ -161,16 +173,17 @@ den_sums AS (
   JOIN base b
     ON b.metric_id = LOWER(m.denominator_metric_id)
   WHERE m.denominator_metric_id !~ '^[0-9]+(\.[0-9]+)?$'
-  GROUP BY 1,2,3,4,5,6
+  GROUP BY 1,2,3,4,5,6,7,8
 ),
 
 computed AS (
   SELECT
     ns.level,
-    ns.county,
+    ns.county_id,
+    CASE WHEN ns.level = 'county' THEN NULL::TEXT ELSE ns.sub_county_id END AS sub_county_id,
     CASE WHEN ns.level = 'county' THEN NULL::TEXT ELSE ns.sub_county END AS sub_county,
-    ns.period_id,
-    ns.period_label,
+    ns.period_id, 
+    ns.period_label, 
     ns.metric_id,
     ns.numerator_metric_id AS numerator_id,
     mm.denominator_metric_id AS denominator_id,
@@ -192,8 +205,8 @@ computed AS (
   LEFT JOIN den_sums ds
     ON ds.metric_id  = ns.metric_id
    AND ds.level      = ns.level
-   AND ds.county     = ns.county
-   AND COALESCE(ds.sub_county,'') = COALESCE(ns.sub_county,'')
+   AND ds.county_id  = ns.county_id
+   AND COALESCE(ds.sub_county_id,'') = COALESCE(ns.sub_county_id,'')
    AND ds.period_id  = ns.period_id
   JOIN metrics_map mm
     ON mm.metric_id  = ns.metric_id
@@ -201,8 +214,8 @@ computed AS (
     ON dc.metric_id = ns.metric_id
   LEFT JOIN base b
     ON b.level       = ns.level
-   AND b.county      = ns.county
-   AND COALESCE(b.sub_county,'') = COALESCE(ns.sub_county,'')
+   AND b.county_id   = ns.county_id
+   AND COALESCE(b.sub_county_id,'') = COALESCE(ns.sub_county_id,'')
    AND b.period_id   = ns.period_id
   GROUP BY 1,2,3,4,5,6,7,8, mm.scale_factor, mm.round_to
 ),
@@ -210,7 +223,9 @@ computed AS (
 final AS (
   SELECT
     c.level,
+    c.county_id,
     c.county,
+    c.sub_county_id,
     c.sub_county,
     c.period_id,
     c.period_label,

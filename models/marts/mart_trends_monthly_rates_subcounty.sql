@@ -1,6 +1,6 @@
 {{ config(
   materialized = 'table',
-  unique_key   = ['level','county','sub_county','period_start','metric_id'],
+  unique_key   = ['level','county_id','sub_county_id','period_start','metric_id'],
   on_schema_change = 'ignore',
   tags = ['trends','monthly','sub_county','api']
 ) }}
@@ -82,7 +82,7 @@ den_chp AS (
 ),
 
 computed_chp AS (
-  SELECT n.level, n.county, n.sub_county, n.period_start, n.month_year, n.metric_id,
+  SELECT n.level, n.county_id, n.county, n.sub_county_id, n.sub_county, n.period_start, n.month_year, n.metric_id,
          ROUND(
            COALESCE(n.numerator_value,0)::numeric / NULLIF(COALESCE(d.chps_enrolled,0)::numeric,0) 
            * mm.scale_factor, mm.round_to
@@ -102,7 +102,9 @@ computed AS (
 
 SELECT
   c.level,
+  c.county_id,
   c.county,
+  c.sub_county_id,
   c.sub_county,
   c.period_start,
   c.month_year,

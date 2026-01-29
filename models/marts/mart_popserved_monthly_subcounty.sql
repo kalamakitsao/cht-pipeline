@@ -1,14 +1,16 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      {"columns": ["sub_county_id", "period_start", "metric_id"], "unique": true},
+      {"columns": ["county_id","sub_county_id", "period_start", "metric_id"], "unique": true},
       {"columns": ["metric_group"]}
     ],
+    on_schema_change='append_new_columns',
     tags=['cadence_daily']
 ) }}
 
 WITH location_hierarchy AS (
     SELECT
+        chp_area_id,
         sub_county_id,
         sub_county,
         county_id,
@@ -18,10 +20,10 @@ WITH location_hierarchy AS (
 
 SELECT
     'sub county' AS level,
+    lh.sub_county_id,
+    lh.sub_county, 
     lh.county_id,
     lh.county,
-    lh.sub_county_id,
-    lh.sub_county,
     fa.period_start,
     TO_CHAR(fa.period_start, 'FMMonth YYYY') AS month_year,
     dm.group_name AS metric_group,

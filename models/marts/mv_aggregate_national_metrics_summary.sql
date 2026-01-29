@@ -8,6 +8,7 @@
       {"columns": ["metric_group", "metric"]},
       {"columns": ["period_label"]}
     ],
+    on_schema_change = 'append_new_columns',
     tags=['cadence_hourly']
 ) }}
 

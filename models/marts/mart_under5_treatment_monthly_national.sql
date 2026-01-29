@@ -6,6 +6,7 @@
       {"columns": ["period_start", "metric_id"], "unique": true},
       {"columns": ["metric_group", "metric"]}
     ],
+    on_schema_change = 'append_new_columns',
     tags=['cadence_daily']
 ) }}
 

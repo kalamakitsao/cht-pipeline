@@ -7,11 +7,13 @@
       {"columns": ["period_start", "period_end"]},
       {"columns": ["last_updated"]}
     ],
+    on_schema_change = 'append_new_columns',
     tags=['cadence_hourly']
 ) }}
 
 WITH location_hierarchy AS (
     SELECT
+        chp_area_id,
         sub_county_id,
         sub_county,
         county_id,

@@ -1,13 +1,14 @@
 {{ config(
   materialized = 'table',
   unique_key   = ['level','period_start','metric_id'],
-  on_schema_change = 'ignore',
+  on_schema_change = 'append_new_columns',
   tags = ['trends','monthly','national','api']
 ) }}
 
 WITH metrics_map AS (
   SELECT *
   FROM ( VALUES
+    ('monthly_rates_reporting_chp',   'is_reporting_chps',   'chps_enrolled',          1.0, 1),
     ('monthly_rates_active_chp',      'active_chps_new',     'chps_enrolled',          1.0, 1),
     ('monthly_rates_pop_coverage',    'people_served',       'people_registered',      1.0, 2),
     ('monthly_rates_household_visit', 'hh_visited',          'households_registered',  1.0, 2)
