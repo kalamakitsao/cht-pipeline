@@ -23,6 +23,7 @@ WITH base AS (
         chp_area.location_id AS chp_area_id,
         chp_area.name AS chp_area
     FROM {{ ref('dim_location') }} chp_area
+    JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'chp_hierarchy') }} ch ON chp_area.location_id = ch.uuid
     LEFT JOIN {{ ref('dim_location') }} chu ON chu.location_id = chp_area.parent_id
     LEFT JOIN {{ ref('dim_location') }} sub ON sub.location_id = chu.parent_id
     LEFT JOIN {{ ref('dim_location') }} county ON county.location_id = sub.parent_id
