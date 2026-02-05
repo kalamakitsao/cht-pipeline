@@ -11,8 +11,8 @@ with base as (
     dr.reported::date as report_date,
     dr.patient_id
   from {{ source(env_var('POSTGRES_SCHEMA'), 'data_record') }} dr
-    join {{ source(env_var('POSTGRES_SCHEMA'), 'contact') }} c on dr.patient_id = c.uuid 
-  where dr.patient_id is not null and c.muted is null
+    -- join {{ source(env_var('POSTGRES_SCHEMA'), 'contact') }} c on dr.patient_id = c.uuid 
+  where dr.patient_id is not null -- and c.muted is null
 ),
 mapped as (
   select b.location_id, pd.period_id, b.patient_id
