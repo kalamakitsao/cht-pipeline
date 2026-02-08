@@ -30,6 +30,8 @@ sources:
         description: "Raw household visit table"
       - name: pregnancy_home_visit
         description: "Raw pregnancy home visit table"
+      - name: pregnancy_screening
+        description: "Raw pregnancy screening table"
       - name: data_record
         description: "Raw data record table"
       - name: postnatal_care_service

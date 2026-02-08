@@ -2,7 +2,7 @@
   materialized = 'table',
   unique_key = ['location_id','period_start','metric_id'],
   tags = ['kpi','cadence_daily'],
-  on_schema_change = 'ignore'
+  on_schema_change = 'append_new_columns'
 ) }}
 
 {% set min_ratio = var('active_min_ratio', 0.33) %}
@@ -32,7 +32,7 @@ scored AS (
       WHEN COALESCE(d.monthly_registered,0) > 0
            AND (COALESCE(n.monthly_visits,0)::float / d.monthly_registered) >= {{ min_ratio }} THEN 1
       ELSE 0
-    END AS is_active
+    END AS meeting_target
   FROM denom d
   LEFT JOIN num n
     ON d.location_id = n.location_id
@@ -42,7 +42,7 @@ scored AS (
 SELECT
   location_id,
   period_start,
-  'active_chps' AS metric_id,
+  'chps_meeting_target' AS metric_id,
   1 AS value
 FROM scored
-WHERE is_active = 1
+WHERE meeting_target = 1

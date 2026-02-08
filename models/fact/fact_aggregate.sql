@@ -2,7 +2,7 @@
 
 {{ config(
     materialized = 'table',
-    on_schema_change = 'ignore',
+    on_schema_change = 'append_new_columns',
     tags = ['cadence_hourly'],
     indexes = [
         {'columns': ['metric_id']},

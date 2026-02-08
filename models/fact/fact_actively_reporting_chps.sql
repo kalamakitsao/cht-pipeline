@@ -2,7 +2,7 @@
     materialized = 'table',
     unique_key = ['location_id', 'period_id', 'metric_id'],
     tags = ['kpi', 'cadence_hourly'],
-    on_schema_change = 'ignore'
+    on_schema_change = 'append_new_columns'
 ) }}
 
 WITH hh_visits AS (
@@ -14,7 +14,7 @@ WITH hh_visits AS (
     FROM {{ ref('fact_households_visited_union') }} hv
         JOIN {{ ref('dim_period') }} p ON hv.period_id = p.period_id
     WHERE metric_id = 'hh_visited'
-        AND period_id_name IN ('today','yesterday','last_7_days','last_1_month','last_3_months','last_6_months', 'this_week', 'this_month', 'last_month', 'this_quarter', 'last_quarter','last_6_months') -- ('4', '11')
+        AND period_id_name IN ('today','yesterday','last_7_days','last_1_month','last_3_months','last_6_months', 'this_week', 'this_month', 'last_month', 'this_quarter', 'last_quarter','last_1_yr') -- ('4', '11')
     GROUP BY location_id, hv.period_id, period_id_name
 ),
 
@@ -27,7 +27,7 @@ households_registered AS (
     FROM {{ ref('fact_households_registered') }} hr
         JOIN {{ ref('dim_period') }} p ON hr.period_id = p.period_id
     WHERE metric_id = 'households_registered' 
-        AND period_id_name IN ('today','yesterday','last_7_days','last_1_month','last_3_months','last_6_months', 'this_week', 'this_month', 'last_month', 'this_quarter', 'last_quarter', 'last_6_months') -- ('4', '11')period_id IN ('4', '11')
+        AND period_id_name IN ('today','yesterday','last_7_days','last_1_month','last_3_months','last_6_months', 'this_week', 'this_month', 'last_month', 'this_quarter', 'last_quarter', 'last_1_yr') -- ('4', '11')period_id IN ('4', '11')
     GROUP BY location_id, hr.period_id, period_id_name
 ),
 
@@ -41,11 +41,11 @@ scored AS (
             WHEN v.hh_visited::FLOAT / hr.households_registered > 0.33 
                 AND hr.period_id_name IN ('last_1_month','this_month', 'last_month') THEN 1
             WHEN v.hh_visited::FLOAT / hr.households_registered >= 1.0 
-                AND hr.period_id_name IN ('last_3_months','this_quarter', 'last_quarter','last_6_months', 'last_last_1_yr', 'all_time') THEN 1
+                AND hr.period_id_name IN ('last_3_months','this_quarter', 'last_quarter','last_6_months', 'last_1_yr', 'all_time') THEN 1
             WHEN v.hh_visited::FLOAT > 0
                 AND hr.period_id_name IN ('today','yesterday', 'last_7_days', 'this_week') THEN 1
             ELSE 0
-        END AS is_active
+        END AS meeting_target
     FROM hh_visits v
     LEFT JOIN households_registered hr
       ON v.location_id = hr.location_id AND v.period_id = hr.period_id
@@ -58,7 +58,7 @@ SELECT
     1 AS value,
     CURRENT_TIMESTAMP AS last_updated
 FROM scored
-WHERE is_active = 1
+WHERE meeting_target = 1
 
 UNION ALL
 
