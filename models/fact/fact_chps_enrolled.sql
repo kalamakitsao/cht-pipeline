@@ -1,9 +1,9 @@
 -- models/fact/metrics/chps_enrolled.sql
 -- Add logic to count enrolled CHPs per period
 {{ config(
-    materialized = 'incremental',
+    materialized = 'table',
     unique_key = ['location_id', 'period_id', 'metric_id'],
-    on_schema_change = 'ignore',
+    on_schema_change = 'append_new_columns',
     tags = ['cadence_hourly']
 ) }}
 
