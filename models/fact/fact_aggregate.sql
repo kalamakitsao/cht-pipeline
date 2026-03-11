@@ -81,6 +81,15 @@ WITH all_facts AS (
 
     UNION ALL
     SELECT * FROM {{ ref('fact_under_five_conditions') }}
+),
+
+-- ============================================================================
+-- Filter: Only include locations that exist in mv_location_hierarchy
+-- This excludes retired/deleted CHP areas and duplicate locations
+-- ============================================================================
+
+valid_chp_areas AS (
+    SELECT chp_area_id FROM {{ ref('mv_location_hierarchy') }}
 )
 
 SELECT
@@ -91,3 +100,7 @@ SELECT
     CURRENT_TIMESTAMP AS last_updated
 FROM all_facts
 WHERE value IS NOT NULL
+AND (
+    location_id IN (SELECT chp_area_id FROM valid_chp_areas)
+    OR metric_id = 'chps_expected'
+  )
