@@ -45,9 +45,8 @@ joined AS (
     f.date_of_death,
     f.date_of_death - coalesce(pfc.date_of_birth,f.report_date) AS age_at_death
   FROM filtered f
-  JOIN {{ ref('dim_period_date_map') }} pd
-  JOIN {{ ref('patient_f_client')}} pfc ON f.patient_uuid = pfc.patient_uuid
-    ON pd.date = f.report_date
+  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = f.report_date
+  JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'patient_f_client') }} pfc ON f.patient_uuid = pfc.patient_uuid
 ),
 
 daily AS (
