@@ -36,3 +36,5 @@ sources:
         description: "Raw data record table"
       - name: postnatal_care_service
         description: "Raw postnatal care service table"
+      - name: chp_hierarchy
+        description: "chp hierarchy table"

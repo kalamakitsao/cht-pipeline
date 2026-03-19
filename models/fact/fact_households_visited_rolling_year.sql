@@ -1,39 +1,69 @@
--- models/fact/metrics/households_visited_rolling_year.sql
 {{ config(
   materialized='table',
   unique_key=['location_id','period_id','metric_id'],
+  indexes=[
+    {'columns': ['location_id','period_id','metric_id'], 'unique': true},
+    {'columns': ['period_id']},
+    {'columns': ['location_id']},
+    {'columns': ['metric_id']}
+  ],
   tags=['kpi','households_visited','cadence_twice_daily'],
   on_schema_change='ignore'
 ) }}
 
-WITH bounds AS (
-  SELECT (CURRENT_DATE - interval '1 year') AS d_start,
-         (CURRENT_DATE - interval '1 day')  AS d_end
+with eligible_periods as (
+  select
+    period_id,
+    period_id_name,
+    start_date,
+    end_date + interval '1 day' as stop_date
+  from {{ ref('dim_period') }}
+  where period_id_name not in ('today', 'all_time')
 ),
-base AS (
-  SELECT
-    hv.reported_by_parent AS location_id,
-    hv.reported::date     AS visit_date,
-    hv.household          AS household_id
-  FROM {{ source(env_var('POSTGRES_SCHEMA'), 'household_visit') }} hv
-    JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'household') }} h on hv.household = h.uuid
-    JOIN {{ ref('mv_location_hierarchy') }} chps on hv.reported_by_parent = chps.chp_area_id
-    JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'contact') }} c ON hv.household = c.uuid and c.contact_type = 'e_household'
-    JOIN bounds b ON true
-  WHERE hv.household IS NOT NULL 
-    AND c.muted is null
-    AND hv.reported::date BETWEEN b.d_start AND b.d_end
+
+bounds as (
+  select
+    min(start_date)::date as min_start_date,
+    max(stop_date)::date as max_stop_date
+  from eligible_periods
 ),
-dated AS (
-  SELECT b.location_id, pd.period_id, b.household_id
-  FROM base b
-  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = b.visit_date WHERE pd.period_id_name <> 'all_time'
+
+base as (
+  select
+    location_id,
+    household_id,
+    reported_date
+  from {{ ref('int_households_visited_daily_pairs') }}
+  cross join bounds b
+  where reported_date >= b.min_start_date
+    and reported_date <  b.max_stop_date
 ),
-agg AS (
-  SELECT location_id, period_id, COUNT(DISTINCT household_id) AS value
-  FROM dated
-  GROUP BY 1,2
+
+mapped as (
+  select
+    b.location_id,
+    p.period_id,
+    b.household_id
+  from base b
+  join eligible_periods p
+    on b.reported_date >= p.start_date
+   and b.reported_date <  p.stop_date
+),
+
+agg as (
+  select
+    location_id,
+    period_id,
+    count(distinct household_id)::bigint as value
+  from mapped
+  group by 1, 2
 )
-SELECT location_id, period_id, 'hh_visited' AS metric_id, value, CURRENT_TIMESTAMP AS last_updated
-FROM agg
-WHERE value > 0
+
+select
+  location_id,
+  period_id,
+  'hh_visited' as metric_id,
+  value,
+  current_timestamp as last_updated
+from agg
+where value > 0

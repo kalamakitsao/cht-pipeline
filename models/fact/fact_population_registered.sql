@@ -1,48 +1,62 @@
 {{ config(
   materialized = 'table',
+  indexes = [
+    {'columns': ['location_id', 'period_id', 'metric_id'], 'unique': true},
+    {'columns': ['period_id']},
+    {'columns': ['metric_id']},
+    {'columns': ['location_id']}
+  ],
   tags = ['kpi','population'],
   on_schema_change = 'ignore'
 ) }}
 
 WITH periods AS (
-  -- Narrow if you only want certain period types, e.g. monthly snapshots:
-  -- SELECT period_id, end_date FROM {{ ref('dim_period') }} WHERE period_type IN ('monthly','yearly')
-  SELECT period_id, end_date
+  SELECT
+    period_id,
+    end_date
   FROM {{ ref('dim_period') }}
+),
+
+base AS (
+  SELECT
+    hp.chp_area_id AS location_id,
+    hp.sex,
+    hp.date_of_birth
+  FROM {{ ref('household_person_enriched') }} hp
+  WHERE hp.chp_area_id IS NOT NULL
+    AND hp.sex IN ('male', 'female')
+    AND hp.muted IS DISTINCT FROM TRUE
 ),
 
 pop AS (
   SELECT
-    hp.chp_area_id AS location_id,
-    p.period_id    AS period_id,
+    b.location_id,
+    p.period_id,
 
-    COUNT(*)                                                     AS population,
-    COUNT(*) FILTER (WHERE hp.sex = 'male')                      AS population_male,
-    COUNT(*) FILTER (WHERE hp.sex = 'female')                    AS population_female,
-
-    COUNT(*) FILTER (
-      WHERE hp.date_of_birth IS NOT NULL
-        AND hp.date_of_birth > (p.end_date - INTERVAL '5 years')
-    )                                                            AS population_under_5,
+    COUNT(*)::bigint AS population,
+    COUNT(*) FILTER (WHERE b.sex = 'male')::bigint AS population_male,
+    COUNT(*) FILTER (WHERE b.sex = 'female')::bigint AS population_female,
 
     COUNT(*) FILTER (
-      WHERE hp.sex = 'male'
-        AND hp.date_of_birth IS NOT NULL
-        AND hp.date_of_birth > (p.end_date - INTERVAL '5 years')
-    )                                                            AS population_under_5_male,
+      WHERE b.date_of_birth IS NOT NULL
+        AND b.date_of_birth > (p.end_date - INTERVAL '5 years')
+    )::bigint AS population_under_5,
 
     COUNT(*) FILTER (
-      WHERE hp.sex = 'female'
-        AND hp.date_of_birth IS NOT NULL
-        AND hp.date_of_birth > (p.end_date - INTERVAL '5 years')
-    )                                                            AS population_under_5_female
+      WHERE b.sex = 'male'
+        AND b.date_of_birth IS NOT NULL
+        AND b.date_of_birth > (p.end_date - INTERVAL '5 years')
+    )::bigint AS population_under_5_male,
 
-  FROM {{ ref('household_person_enriched') }} hp
+    COUNT(*) FILTER (
+      WHERE b.sex = 'female'
+        AND b.date_of_birth IS NOT NULL
+        AND b.date_of_birth > (p.end_date - INTERVAL '5 years')
+    )::bigint AS population_under_5_female
+
+  FROM base b
   CROSS JOIN periods p
-  WHERE hp.chp_area_id IS NOT NULL
-    AND hp.sex IN ('male','female')
-    AND hp.muted IS NULL
-  GROUP BY 1,2
+  GROUP BY 1, 2
 ),
 
 metrics AS (
@@ -67,7 +81,7 @@ SELECT
   location_id,
   period_id,
   metric_id,
-  value::bigint AS value,
+  value,
   CURRENT_TIMESTAMP AS last_updated
 FROM metrics
 WHERE value > 0

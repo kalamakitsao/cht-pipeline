@@ -1,21 +1,39 @@
 -- models/fact/metrics/fact_pnc_newborn.sql
 
 -- depends_on: {{ ref('dim_period') }}
--- depends_on: {{ ref('dim_period_date_map') }}
-
-{% set dp = ref('dim_period') %}
-{% set dpdm = ref('dim_period_date_map') %}
 
 {{ config(
-  materialized = 'incremental',
-  incremental_strategy = 'delete+insert',
+  materialized = 'table',
   unique_key = ['location_id','period_id','metric_id'],
   tags = ['kpi','pnc','newborn','cadence_hourly'],
   on_schema_change = 'ignore'
 ) }}
 
-WITH base AS (
-  SELECT
+with non_all_time_periods as (
+  select
+    period_id,
+    start_date,
+    end_date + interval '1 day' as stop_date
+  from {{ ref('dim_period') }}
+  where period_id_name <> 'all_time'
+),
+
+all_time_period as (
+  select
+    period_id
+  from {{ ref('dim_period') }}
+  where period_id_name = 'all_time'
+),
+
+non_all_time_bounds as (
+  select
+    min(start_date) as min_start_date,
+    max(stop_date) as max_stop_date
+  from non_all_time_periods
+),
+
+base_recent as (
+  select
     e.location_id,
     e.reported_date,
     e.patient_id,
@@ -24,15 +42,18 @@ WITH base AS (
     e.needs_missed_visit_follow_up,
     e.place_of_birth_display,
     e.pnc_service_count,
-    (e.is_referred OR e.is_referred_for_pnc_services OR e.is_referred_immunization) AS any_referred
-  FROM {{ ref('postnatal_care_service_newborn_enriched') }} e
+    (e.is_referred or e.is_referred_for_pnc_services or e.is_referred_immunization) as any_referred
+  from {{ ref('postnatal_care_service_newborn_enriched') }} e
+  cross join non_all_time_bounds b
+  where e.patient_id is not null
+    and e.reported_date >= b.min_start_date
+    and e.reported_date <  b.max_stop_date
 ),
 
--- map day→period via equality join (index-friendly)
-with_period AS (
-  SELECT
+recent_with_period as (
+  select
     b.location_id,
-    pd.period_id,
+    p.period_id,
     b.patient_id,
     b.is_referred_immunization,
     b.needs_danger_signs_follow_up,
@@ -40,61 +61,89 @@ with_period AS (
     b.place_of_birth_display,
     b.pnc_service_count,
     b.any_referred
-  FROM base b
-  JOIN {{ dpdm }} pd
-    ON pd.date = b.reported_date
+  from base_recent b
+  join non_all_time_periods p
+    on b.reported_date >= p.start_date
+   and b.reported_date <  p.stop_date
 ),
 
--- single pass aggregate with FILTERs on DISTINCT patients
-agg AS (
-  SELECT
+recent_agg as (
+  select
     wp.location_id,
     wp.period_id,
-
-    COUNT(DISTINCT wp.patient_id) FILTER (WHERE wp.is_referred_immunization)                              AS newborn_referred_immunization,
-    COUNT(DISTINCT wp.patient_id) FILTER (WHERE wp.needs_danger_signs_follow_up)                          AS newborn_needs_danger_signs_follow_up,
-    COUNT(DISTINCT wp.patient_id) FILTER (WHERE wp.needs_missed_visit_follow_up)                          AS newborn_needs_missed_visit_follow_up,
-    COUNT(DISTINCT wp.patient_id) FILTER (WHERE wp.place_of_birth_display ILIKE '%home%')                 AS newborn_home_delivery,
-    COUNT(DISTINCT wp.patient_id) FILTER (WHERE wp.pnc_service_count IS NOT NULL AND wp.pnc_service_count > 0)
-                                                                                                          AS newborn_pnc_service_count,
-    COUNT(DISTINCT wp.patient_id) FILTER (WHERE wp.any_referred)                                          AS newborn_any_referred
-  FROM with_period wp
-  GROUP BY wp.location_id, wp.period_id
+    count(distinct wp.patient_id) filter (where wp.is_referred_immunization) as newborn_referred_immunization,
+    count(distinct wp.patient_id) filter (where wp.needs_danger_signs_follow_up) as newborn_needs_danger_signs_follow_up,
+    count(distinct wp.patient_id) filter (where wp.needs_missed_visit_follow_up) as newborn_needs_missed_visit_follow_up,
+    count(distinct wp.patient_id) filter (where wp.place_of_birth_display ilike '%home%') as newborn_home_delivery,
+    count(distinct wp.patient_id) filter (
+      where wp.pnc_service_count is not null and wp.pnc_service_count > 0
+    ) as newborn_pnc_service_count,
+    count(distinct wp.patient_id) filter (where wp.any_referred) as newborn_any_referred
+  from recent_with_period wp
+  group by wp.location_id, wp.period_id
 ),
 
--- tiny unpivot → metric rows
-metrics AS (
-  SELECT
+base_all_time as (
+  select
+    e.location_id,
+    tp.period_id,
+    e.patient_id,
+    e.is_referred_immunization,
+    e.needs_danger_signs_follow_up,
+    e.needs_missed_visit_follow_up,
+    e.place_of_birth_display,
+    e.pnc_service_count,
+    (e.is_referred or e.is_referred_for_pnc_services or e.is_referred_immunization) as any_referred
+  from {{ ref('postnatal_care_service_newborn_enriched') }} e
+  cross join all_time_period tp
+  where e.patient_id is not null
+),
+
+all_time_agg as (
+  select
+    b.location_id,
+    b.period_id,
+    count(distinct b.patient_id) filter (where b.is_referred_immunization) as newborn_referred_immunization,
+    count(distinct b.patient_id) filter (where b.needs_danger_signs_follow_up) as newborn_needs_danger_signs_follow_up,
+    count(distinct b.patient_id) filter (where b.needs_missed_visit_follow_up) as newborn_needs_missed_visit_follow_up,
+    count(distinct b.patient_id) filter (where b.place_of_birth_display ilike '%home%') as newborn_home_delivery,
+    count(distinct b.patient_id) filter (
+      where b.pnc_service_count is not null and b.pnc_service_count > 0
+    ) as newborn_pnc_service_count,
+    count(distinct b.patient_id) filter (where b.any_referred) as newborn_any_referred
+  from base_all_time b
+  group by b.location_id, b.period_id
+),
+
+agg as (
+  select * from recent_agg
+  union all
+  select * from all_time_agg
+),
+
+metrics as (
+  select
     a.location_id,
     a.period_id,
     m.metric_id,
     m.value
-  FROM agg a
-  CROSS JOIN LATERAL (
-    VALUES
+  from agg a
+  cross join lateral (
+    values
       ('newborn_referred_immunization',        a.newborn_referred_immunization),
       ('newborn_needs_danger_signs_follow_up', a.newborn_needs_danger_signs_follow_up),
       ('newborn_needs_missed_visit_follow_up', a.newborn_needs_missed_visit_follow_up),
-      ('newborn_home_delivery',                 a.newborn_home_delivery),
-      ('newborn_pnc_service_count',             a.newborn_pnc_service_count),
-      ('newborn_any_referred',                  a.newborn_any_referred)
-  ) AS m(metric_id, value)
+      ('newborn_home_delivery',                a.newborn_home_delivery),
+      ('newborn_pnc_service_count',            a.newborn_pnc_service_count),
+      ('newborn_any_referred',                 a.newborn_any_referred)
+  ) as m(metric_id, value)
 )
 
-SELECT
+select
   location_id,
   period_id,
   metric_id,
   value,
-  CURRENT_TIMESTAMP AS last_updated
-FROM metrics
-WHERE value > 0
-
-{% if is_incremental() %}
-  {# Recompute only recent periods likely to change; tune the window #}
-  {% set preds = [
-    "period_id IN (SELECT period_id FROM " ~ dp ~
-    " WHERE end_date >= CURRENT_DATE - interval '35 days')"
-  ] %}
-  {{ config(incremental_predicates = preds) }}
-{% endif %}
+  current_timestamp as last_updated
+from metrics
+where value > 0

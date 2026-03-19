@@ -9,6 +9,7 @@
 ) }}
 WITH location_hierarchy AS (
     SELECT
+        chp_area_id,
         community_unit_id,
         community_unit,
         sub_county_id,

@@ -1,32 +1,37 @@
--- models/fact/metrics/households_visited_all_time.sql
 {{ config(
   materialized='table',
   unique_key=['location_id','period_id','metric_id'],
+  indexes=[
+    {'columns': ['location_id','period_id','metric_id'], 'unique': true},
+    {'columns': ['period_id']},
+    {'columns': ['location_id']},
+    {'columns': ['metric_id']}
+  ],
   tags=['kpi','households_visited','cadence_daily'],
   on_schema_change='ignore'
 ) }}
 
-WITH base AS (
-  SELECT
-    hv.reported_by_parent AS location_id,
-    hv.reported::date     AS visit_date,
-    hv.household          AS household_id
-  FROM {{ source(env_var('POSTGRES_SCHEMA'), 'household_visit') }} hv
-    JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'household') }} h on hv.household = h.uuid
-    JOIN {{ ref('mv_location_hierarchy') }} chps on hv.reported_by_parent = chps.chp_area_id
-    JOIN {{ source(env_var('POSTGRES_SCHEMA'), 'contact') }} c ON hv.household = c.uuid and c.contact_type = 'e_household'
-  WHERE hv.household IS NOT NULL and c.muted is null
+WITH all_time_period AS (
+  SELECT period_id
+  FROM {{ ref('dim_period') }}
+  WHERE period_id_name = 'all_time'
 ),
-dated AS (
-  SELECT b.location_id, pd.period_id, b.household_id
-  FROM base b
-  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = b.visit_date WHERE pd.period_id_name = 'all_time'
-),
+
 agg AS (
-  SELECT location_id, period_id, COUNT(DISTINCT household_id) AS value
-  FROM dated
-  GROUP BY 1,2
+  SELECT
+    location_id,
+    COUNT(*)::bigint AS value,
+    MAX(last_updated) AS last_updated
+  FROM {{ ref('int_households_visited_pairs_all_time') }}
+  GROUP BY 1
 )
-SELECT location_id, period_id, 'hh_visited' AS metric_id, value, CURRENT_TIMESTAMP AS last_updated
-FROM agg
-WHERE value > 0
+
+SELECT
+  a.location_id,
+  p.period_id,
+  'hh_visited' AS metric_id,
+  a.value,
+  a.last_updated
+FROM agg a
+CROSS JOIN all_time_period p
+WHERE a.value > 0

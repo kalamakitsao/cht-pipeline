@@ -6,25 +6,41 @@
   on_schema_change='ignore'
 ) }}
 
-WITH base AS (
-  SELECT
-    hv.reported_by_parent AS location_id,
-    hv.reported::date     AS visit_date,
-    hv.household          AS household_id
-  FROM {{ source(env_var('POSTGRES_SCHEMA'), 'household_visit') }} hv
-  WHERE hv.household IS NOT NULL
-    AND hv.reported::date = CURRENT_DATE
+with today_period as (
+  select
+    period_id,
+    end_date as start_date,
+    end_date + interval '1 day' as stop_date
+  from {{ ref('dim_period') }}
+  where period_id_name = 'today'
 ),
-dated AS (
-  SELECT b.location_id, pd.period_id, b.household_id
-  FROM base b
-  JOIN {{ ref('dim_period_date_map') }} pd ON pd.date = b.visit_date WHERE pd.period_id_name = 'today'
+
+base as (
+  select
+    hv.reported_by_parent as location_id,
+    tp.period_id,
+    hv.household as household_id
+  from {{ source(env_var('POSTGRES_SCHEMA'), 'household_visit') }} hv
+  cross join today_period tp
+  where hv.household is not null
+    and hv.reported >= tp.start_date
+    and hv.reported < tp.stop_date
 ),
-agg AS (
-  SELECT location_id, period_id, COUNT(DISTINCT household_id) AS value
-  FROM dated
-  GROUP BY 1,2
+
+agg as (
+  select
+    location_id,
+    period_id,
+    count(distinct household_id) as value
+  from base
+  group by 1, 2
 )
-SELECT location_id, period_id, 'hh_visited' AS metric_id, value, CURRENT_TIMESTAMP AS last_updated
-FROM agg
-WHERE value > 0
+
+select
+  location_id,
+  period_id,
+  'hh_visited' as metric_id,
+  value,
+  current_timestamp as last_updated
+from agg
+where value > 0

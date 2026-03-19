@@ -7,10 +7,17 @@
   on_schema_change = 'ignore'
 ) }}
 
-WITH base AS (
-  SELECT
-    e.reported_by_parent AS location_id,
-    e.reported_date      AS report_date,
+with all_time_period as (
+  select
+    period_id
+  from {{ ref('dim_period') }}
+  where period_id_name = 'all_time'
+),
+
+base as (
+  select
+    e.reported_by_parent as location_id,
+    tp.period_id,
     e.patient_id,
     e.sex,
     e.screened_for_diabetes,
@@ -20,118 +27,101 @@ WITH base AS (
     e.screened_for_mental_health,
     e.is_referred_mental_health,
     e.has_been_referred
-  FROM {{ ref('over_five_assessment_enriched') }} e
+  from {{ ref('over_five_assessment_enriched') }} e
+  cross join all_time_period tp
 ),
 
--- EVENTS (workload)
-events_expanded AS (
-  SELECT
+events_expanded as (
+  select
     b.location_id,
-    b.report_date,
-    UNNEST(ARRAY[
-      CASE WHEN b.screened_for_diabetes      IS TRUE THEN 'screenings_diabetes' END,
-      CASE WHEN b.screened_for_hypertension  IS TRUE THEN 'screenings_hypertension' END,
-      CASE WHEN b.screened_for_mental_health IS TRUE THEN 'screenings_mental_health' END,
+    b.period_id,
+    unnest(array[
+      case when b.screened_for_diabetes      is true then 'screenings_diabetes' end,
+      case when b.screened_for_hypertension  is true then 'screenings_hypertension' end,
+      case when b.screened_for_mental_health is true then 'screenings_mental_health' end,
 
-      CASE WHEN b.screened_for_diabetes      IS TRUE AND b.sex='male'   THEN 'screenings_diabetes_male'   END,
-      CASE WHEN b.screened_for_diabetes      IS TRUE AND b.sex='female' THEN 'screenings_diabetes_female' END,
+      case when b.screened_for_diabetes      is true and b.sex = 'male'   then 'screenings_diabetes_male' end,
+      case when b.screened_for_diabetes      is true and b.sex = 'female' then 'screenings_diabetes_female' end,
 
-      CASE WHEN b.screened_for_hypertension  IS TRUE AND b.sex='male'   THEN 'screenings_hypertension_male'   END,
-      CASE WHEN b.screened_for_hypertension  IS TRUE AND b.sex='female' THEN 'screenings_hypertension_female' END,
+      case when b.screened_for_hypertension  is true and b.sex = 'male'   then 'screenings_hypertension_male' end,
+      case when b.screened_for_hypertension  is true and b.sex = 'female' then 'screenings_hypertension_female' end,
 
-      CASE WHEN b.screened_for_mental_health IS TRUE AND b.sex='male'   THEN 'screenings_mental_health_male'   END,
-      CASE WHEN b.screened_for_mental_health IS TRUE AND b.sex='female' THEN 'screenings_mental_health_female' END
-    ]) AS metric_id
-  FROM base b
+      case when b.screened_for_mental_health is true and b.sex = 'male'   then 'screenings_mental_health_male' end,
+      case when b.screened_for_mental_health is true and b.sex = 'female' then 'screenings_mental_health_female' end
+    ]) as metric_id
+  from base b
 ),
 
-events_dated AS (
-  SELECT e.location_id, p.period_id, e.metric_id
-  FROM events_expanded e
-  JOIN {{ ref('dim_period_date_map') }} p
-    ON p.date = e.report_date
-  WHERE p.period_id_name = 'all_time'
-    AND e.metric_id IS NOT NULL
-),
-
-events_agg AS (
-  SELECT
+events_agg as (
+  select
     location_id,
     period_id,
     metric_id,
-    COUNT(*) AS value
-  FROM events_dated
-  GROUP BY 1,2,3
+    count(*) as value
+  from events_expanded
+  where metric_id is not null
+  group by 1,2,3
 ),
 
--- PEOPLE (unique individuals)
-people_expanded AS (
-  SELECT
+people_expanded as (
+  select
     b.location_id,
-    b.report_date,
+    b.period_id,
     b.patient_id,
-    UNNEST(ARRAY[
-      CASE WHEN b.screened_for_diabetes      IS TRUE THEN 'screened_diabetes' END,
-      CASE WHEN b.screened_for_diabetes      IS TRUE AND b.sex='male'   THEN 'screened_diabetes_male'   END,
-      CASE WHEN b.screened_for_diabetes      IS TRUE AND b.sex='female' THEN 'screened_diabetes_female' END,
+    unnest(array[
+      case when b.screened_for_diabetes      is true then 'screened_diabetes' end,
+      case when b.screened_for_diabetes      is true and b.sex = 'male'   then 'screened_diabetes_male' end,
+      case when b.screened_for_diabetes      is true and b.sex = 'female' then 'screened_diabetes_female' end,
 
-      CASE WHEN b.screened_for_hypertension  IS TRUE THEN 'screened_hypertension' END,
-      CASE WHEN b.screened_for_hypertension  IS TRUE AND b.sex='male'   THEN 'screened_hypertension_male'   END,
-      CASE WHEN b.screened_for_hypertension  IS TRUE AND b.sex='female' THEN 'screened_hypertension_female' END,
+      case when b.screened_for_hypertension  is true then 'screened_hypertension' end,
+      case when b.screened_for_hypertension  is true and b.sex = 'male'   then 'screened_hypertension_male' end,
+      case when b.screened_for_hypertension  is true and b.sex = 'female' then 'screened_hypertension_female' end,
 
-      CASE WHEN b.screened_for_mental_health IS TRUE THEN 'screened_mental_health' END,
-      CASE WHEN b.screened_for_mental_health IS TRUE AND b.sex='male'   THEN 'screened_mental_health_male'   END,
-      CASE WHEN b.screened_for_mental_health IS TRUE AND b.sex='female' THEN 'screened_mental_health_female' END,
+      case when b.screened_for_mental_health is true then 'screened_mental_health' end,
+      case when b.screened_for_mental_health is true and b.sex = 'male'   then 'screened_mental_health_male' end,
+      case when b.screened_for_mental_health is true and b.sex = 'female' then 'screened_mental_health_female' end,
 
-      CASE WHEN b.is_referred_diabetes       IS TRUE THEN 'referred_diabetes' END,
-      CASE WHEN b.is_referred_diabetes       IS TRUE AND b.sex='male'   THEN 'referred_diabetes_male'   END,
-      CASE WHEN b.is_referred_diabetes       IS TRUE AND b.sex='female' THEN 'referred_diabetes_female' END,
+      case when b.is_referred_diabetes       is true then 'referred_diabetes' end,
+      case when b.is_referred_diabetes       is true and b.sex = 'male'   then 'referred_diabetes_male' end,
+      case when b.is_referred_diabetes       is true and b.sex = 'female' then 'referred_diabetes_female' end,
 
-      CASE WHEN b.is_referred_hypertension   IS TRUE THEN 'referred_hypertension' END,
-      CASE WHEN b.is_referred_hypertension   IS TRUE AND b.sex='male'   THEN 'referred_hypertension_male'   END,
-      CASE WHEN b.is_referred_hypertension   IS TRUE AND b.sex='female' THEN 'referred_hypertension_female' END,
+      case when b.is_referred_hypertension   is true then 'referred_hypertension' end,
+      case when b.is_referred_hypertension   is true and b.sex = 'male'   then 'referred_hypertension_male' end,
+      case when b.is_referred_hypertension   is true and b.sex = 'female' then 'referred_hypertension_female' end,
 
-      CASE WHEN b.is_referred_mental_health  IS TRUE THEN 'referred_mental_health' END,
-      CASE WHEN b.is_referred_mental_health  IS TRUE AND b.sex='male'   THEN 'referred_mental_health_male'   END,
-      CASE WHEN b.is_referred_mental_health  IS TRUE AND b.sex='female' THEN 'referred_mental_health_female' END,
+      case when b.is_referred_mental_health  is true then 'referred_mental_health' end,
+      case when b.is_referred_mental_health  is true and b.sex = 'male'   then 'referred_mental_health_male' end,
+      case when b.is_referred_mental_health  is true and b.sex = 'female' then 'referred_mental_health_female' end,
 
-      CASE WHEN b.has_been_referred          IS TRUE THEN 'over_5_referred' END,
-      CASE WHEN b.has_been_referred          IS TRUE AND b.sex='male'   THEN 'over_5_referred_male'   END,
-      CASE WHEN b.has_been_referred          IS TRUE AND b.sex='female' THEN 'over_5_referred_female' END,
+      case when b.has_been_referred          is true then 'over_5_referred' end,
+      case when b.has_been_referred          is true and b.sex = 'male'   then 'over_5_referred_male' end,
+      case when b.has_been_referred          is true and b.sex = 'female' then 'over_5_referred_female' end,
 
       'over_5_assessments'
-    ]) AS metric_id
-  FROM base b
+    ]) as metric_id
+  from base b
 ),
 
-people_dated AS (
-  SELECT e.location_id, p.period_id, e.metric_id, e.patient_id
-  FROM people_expanded e
-  JOIN {{ ref('dim_period_date_map') }} p
-    ON p.date = e.report_date
-  WHERE p.period_id_name = 'all_time'
-    AND e.metric_id IS NOT NULL
-),
-
-people_agg AS (
-  SELECT
+people_agg as (
+  select
     location_id,
     period_id,
     metric_id,
-    COUNT(DISTINCT patient_id) AS value
-  FROM people_dated
-  GROUP BY 1,2,3
+    count(distinct patient_id) as value
+  from people_expanded
+  where metric_id is not null
+  group by 1,2,3
 )
 
-SELECT
+select
   location_id,
   period_id,
   metric_id,
   value,
-  CURRENT_TIMESTAMP AS last_updated
-FROM (
-  SELECT * FROM events_agg
-  UNION ALL
-  SELECT * FROM people_agg
+  current_timestamp as last_updated
+from (
+  select * from events_agg
+  union all
+  select * from people_agg
 ) s
-WHERE value > 0
+where value > 0

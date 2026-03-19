@@ -1,32 +1,64 @@
+-- models/fact/metrics/fact_people_served_rolling_year.sql
 {{ config(
   materialized='table',
   unique_key=['location_id','period_id','metric_id'],
+  indexes=[
+    {'columns': ['location_id','period_id','metric_id'], 'unique': true},
+    {'columns': ['period_id']},
+    {'columns': ['location_id']},
+    {'columns': ['metric_id']}
+  ],
   tags=['kpi','people_served','cadence_twice_daily']
 ) }}
 
-with bounds as (
-  select (CURRENT_DATE - interval '1 year') as start_d, (CURRENT_DATE - interval '1 day') as end_d
+with eligible_periods as (
+  select
+    period_id,
+    period_id_name,
+    start_date,
+    end_date + interval '1 day' as stop_date
+  from {{ ref('dim_period') }}
+  where period_id_name not in ('today', 'all_time')
 ),
+
+bounds as (
+  select
+    min(start_date)::date as min_start_date,
+    max(stop_date)::date as max_stop_date
+  from eligible_periods
+),
+
 base as (
   select
-    dr.parent_uuid as location_id,
-    dr.reported::date as report_date,
-    dr.patient_id
-  from {{ source(env_var('POSTGRES_SCHEMA'), 'data_record') }} dr
-  join bounds b on true
-  where dr.patient_id is not null
-    and dr.reported::date between b.start_d and b.end_d
+    location_id,
+    patient_id,
+    reported_date
+  from {{ ref('int_people_served_daily_pairs') }}
+  cross join bounds b
+  where reported_date >= b.min_start_date
+    and reported_date < b.max_stop_date
 ),
+
 mapped as (
-  select b.location_id, pd.period_id, b.patient_id
+  select
+    b.location_id,
+    p.period_id,
+    b.patient_id
   from base b
-  join {{ ref('dim_period_date_map') }} pd on pd.date = b.report_date WHERE period_id_name <> 'all_time'
+  join eligible_periods p
+    on b.reported_date >= p.start_date
+   and b.reported_date < p.stop_date
 ),
+
 agg as (
-  select location_id, period_id, count(distinct patient_id) as value
+  select
+    location_id,
+    period_id,
+    count(distinct patient_id)::bigint as value
   from mapped
   group by 1,2
 )
+
 select
   location_id,
   period_id,
