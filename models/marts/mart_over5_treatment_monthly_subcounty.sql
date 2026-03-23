@@ -1,9 +1,7 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      -- Unique constraint: one row per sub-county x month x metric
       {"columns": ["sub_county_id", "period_start", "metric_id"], "unique": true},
-      -- Composite index: drives sub-county level dashboard queries
       {"columns": ["county", "sub_county", "period_start"]},
       {"columns": ["metric_group"]}
     ],

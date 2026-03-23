@@ -1,11 +1,8 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      -- Unique constraint: one row per month x metric (no location dimension)
       {"columns": ["period_start", "metric_id"], "unique": true},
-      -- National tables are small; metric_group+metric covers the main panel query
       {"columns": ["metric_group", "metric"]},
-      -- Period index supports time-series range queries
       {"columns": ["period_start"]}
     ],
     on_schema_change = 'append_new_columns',

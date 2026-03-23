@@ -2,12 +2,9 @@
     materialized = 'table',
     indexes = [
       {"columns": ["level", "county_id", "sub_county_id", "period_start", "metric_id"], "unique": true},
-      -- Primary filter path for sub-county trend charts
       {"columns": ["county", "sub_county", "period_start"]},
       {"columns": ["county", "period_start"]}
     ],
-    -- NOTE: original used on_schema_change='ignore' which silently drops new
-    -- columns; changed to 'append_new_columns' to match all other mart models.
     on_schema_change = 'append_new_columns',
     tags = ['trends','monthly','sub_county','api']
 ) }}

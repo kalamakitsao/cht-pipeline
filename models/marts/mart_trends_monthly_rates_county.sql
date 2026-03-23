@@ -2,7 +2,6 @@
     materialized = 'table',
     indexes = [
       {"columns": ["level", "county_id", "county", "period_start", "metric_id"], "unique": true},
-      -- County-level trend queries filter only by county + period
       {"columns": ["county", "period_start"]}
     ],
     on_schema_change = 'append_new_columns',

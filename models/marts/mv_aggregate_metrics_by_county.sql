@@ -2,9 +2,7 @@
     materialized = 'table',
     indexes = [
       {"columns": ["county_id", "period_id", "metric_id"], "unique": true},
-      -- Composite: drives county-level dashboard queries
       {"columns": ["county", "period_label"]},
-      -- ID-based path used internally by mart_trends_monthly_rates_county
       {"columns": ["county_id", "period_id"]},
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},

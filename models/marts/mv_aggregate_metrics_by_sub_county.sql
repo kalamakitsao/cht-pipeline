@@ -2,7 +2,6 @@
     materialized = 'table',
     indexes = [
       {"columns": ["sub_county_id", "period_id", "metric_id"], "unique": true},
-      -- Composite: drives sub-county dashboard queries
       {"columns": ["county", "sub_county", "period_label"]},
       {"columns": ["county", "period_label"]},
       {"columns": ["metric_group"]},

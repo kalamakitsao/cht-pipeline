@@ -2,7 +2,6 @@
     materialized = 'table',
     indexes = [
       {"columns": ["level", "period_start", "metric_id"], "unique": true},
-      -- National tables are small; period + metric_group cover all query patterns
       {"columns": ["period_start"]},
       {"columns": ["metric_group", "metric"]}
     ],

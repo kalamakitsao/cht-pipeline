@@ -1,8 +1,6 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      -- Maps API queries filter by level + county (or sub_county) + period_label.
-      -- These three indexes cover every filter combination the API sends.
       {"columns": ["level", "county", "period_label"]},
       {"columns": ["county", "period_label"]},
       {"columns": ["sub_county", "period_label"]}

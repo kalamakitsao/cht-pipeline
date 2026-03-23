@@ -2,7 +2,6 @@
     materialized = 'table',
     indexes = [
       {"columns": ["level", "county_id", "sub_county_id", "community_unit_id", "period_start", "metric_id"], "unique": true},
-      -- Primary filter path for community-unit trend charts
       {"columns": ["county", "sub_county", "community_unit", "period_start"]},
       {"columns": ["county", "period_start"]}
     ],

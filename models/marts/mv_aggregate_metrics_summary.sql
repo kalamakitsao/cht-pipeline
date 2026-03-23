@@ -3,21 +3,12 @@
 {{ config(
     materialized = 'table',
     indexes = [
-      -- Unique constraint: one aggregated row per location x period x metric
       {"columns": ["location_id", "period_id", "metric_id"], "unique": true},
-      -- PRIMARY FIX: full hierarchy text-name composite index.
-      -- The API filters on text names (not IDs) across all four hierarchy levels
-      -- plus period_label. Without this, Postgres bitmap-scans ~5 million rows on
-      -- every "All Time" query, then filters out 624k rows per worker (37s query).
-      -- With this index, the planner does a direct Index Scan returning ~72 rows.
       {"columns": ["county", "sub_county", "community_unit", "chp_area", "period_label"]},
-      -- Narrower variants for panels that filter at a higher hierarchy level
       {"columns": ["county", "period_label"]},
       {"columns": ["sub_county", "period_label"]},
       {"columns": ["community_unit", "period_label"]},
-      -- ID-based path used by mart_trends when joining this table internally
       {"columns": ["chp_area_id", "period_label"]},
-      -- Retained existing supporting indexes
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
       {"columns": ["last_updated"]}

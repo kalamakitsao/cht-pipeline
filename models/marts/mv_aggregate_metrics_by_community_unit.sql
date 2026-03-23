@@ -2,7 +2,6 @@
     materialized = 'table',
     indexes = [
       {"columns": ["county_id", "sub_county_id", "community_unit_id", "period_id", "metric_id"], "unique": true},
-      -- Composite: drives community-unit level dashboard queries
       {"columns": ["county", "sub_county", "community_unit", "period_label"]},
       {"columns": ["county", "period_label"]},
       {"columns": ["sub_county", "period_label"]},
