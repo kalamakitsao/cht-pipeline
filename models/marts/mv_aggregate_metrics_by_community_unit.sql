@@ -2,13 +2,16 @@
     materialized = 'table',
     indexes = [
       {"columns": ["county_id", "sub_county_id", "community_unit_id", "period_id", "metric_id"], "unique": true},
-      {"columns": ["period_label"]},
+      -- Composite: drives community-unit level dashboard queries
+      {"columns": ["county", "sub_county", "community_unit", "period_label"]},
+      {"columns": ["county", "period_label"]},
+      {"columns": ["sub_county", "period_label"]},
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
       {"columns": ["last_updated"]}
     ],
     on_schema_change = 'append_new_columns',
-    tags=['cadence_hourly']
+    tags = ['cadence_hourly']
 ) }}
 WITH location_hierarchy AS (
     SELECT

@@ -2,13 +2,16 @@
     materialized = 'table',
     indexes = [
       {"columns": ["county_id", "period_id", "metric_id"], "unique": true},
-      {"columns": ["period_label"]},
+      -- Composite: drives county-level dashboard queries
+      {"columns": ["county", "period_label"]},
+      -- ID-based path used internally by mart_trends_monthly_rates_county
+      {"columns": ["county_id", "period_id"]},
       {"columns": ["metric_group"]},
       {"columns": ["period_start", "period_end"]},
       {"columns": ["last_updated"]}
     ],
     on_schema_change = 'append_new_columns',
-    tags=['cadence_hourly']
+    tags = ['cadence_hourly']
 ) }}
 WITH location_hierarchy AS (
     SELECT

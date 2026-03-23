@@ -1,8 +1,13 @@
 {{ config(
-  materialized = 'table',
-  unique_key   = ['level','period_start','metric_id'],
-  on_schema_change = 'append_new_columns',
-  tags = ['trends','monthly','national','api']
+    materialized = 'table',
+    indexes = [
+      {"columns": ["level", "period_start", "metric_id"], "unique": true},
+      -- National tables are small; period + metric_group cover all query patterns
+      {"columns": ["period_start"]},
+      {"columns": ["metric_group", "metric"]}
+    ],
+    on_schema_change = 'append_new_columns',
+    tags = ['trends','monthly','national','api']
 ) }}
 
 WITH metrics_map AS (

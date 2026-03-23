@@ -1,8 +1,14 @@
 {{ config(
-  materialized = 'table',
-  unique_key   = ['level','county_id','county','sub_county_id','sub_county','period_id','metric_id'],
-  on_schema_change = 'append_new_columns',
-  tags = ['maps','metrics','api']
+    materialized = 'table',
+    indexes = [
+      -- Maps API queries filter by level + county (or sub_county) + period_label.
+      -- These three indexes cover every filter combination the API sends.
+      {"columns": ["level", "county", "period_label"]},
+      {"columns": ["county", "period_label"]},
+      {"columns": ["sub_county", "period_label"]}
+    ],
+    on_schema_change = 'append_new_columns',
+    tags = ['maps','metrics','api']
 ) }}
 
 WITH metrics_map AS (

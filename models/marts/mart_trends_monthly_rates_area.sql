@@ -1,8 +1,18 @@
 {{ config(
-  materialized = 'table',
-  unique_key   = ['level','county_id','sub_county_id','community_unit_id','chp_area_id','period_start','metric_id'],
-  on_schema_change = 'append_new_columns',
-  tags = ['trends','monthly','chp_area','api']
+    -- materialized='table' recreates the table (and all indexes) on every dbt run,
+    -- so listing indexes here is sufficient -- no manual CREATE INDEX needed.
+    materialized = 'table',
+    indexes = [
+      -- Unique constraint across full hierarchy x month x metric
+      {"columns": ["level", "county_id", "sub_county_id", "community_unit_id", "chp_area_id", "period_start", "metric_id"], "unique": true},
+      -- Full hierarchy composite: primary API filter path for trend charts
+      {"columns": ["county", "sub_county", "community_unit", "chp_area", "period_start"]},
+      -- Narrower variants support higher-level panel drill-downs
+      {"columns": ["county", "sub_county", "community_unit", "period_start"]},
+      {"columns": ["county", "period_start"]}
+    ],
+    on_schema_change = 'append_new_columns',
+    tags = ['trends','monthly','chp_area','api']
 ) }}
 
 WITH metrics_map AS (

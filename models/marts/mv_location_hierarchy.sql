@@ -3,13 +3,17 @@
     unique_key = 'chp_area_id',
     on_schema_change = 'append_new_columns',
     indexes = [
-        {'columns': ['chp_area_id'], 'unique': true},
-        {'columns': ['county_id']},
-        {'columns': ['sub_county_id']},
-        {'columns': ['community_unit_id']},
-        {'columns': ['chp_area']}
+      -- Primary unique lookup by CHP area ID
+      {'columns': ['chp_area_id'], 'unique': true},
+      -- Individual ID indexes support JOIN operations from fact tables
+      {'columns': ['county_id']},
+      {'columns': ['sub_county_id']},
+      {'columns': ['community_unit_id']},
+      -- Text-name index: supports human-readable hierarchy lookups and
+      -- is used by mart_trends JOIN conditions (LOWER(TRIM(chp_area)))
+      {'columns': ['chp_area']}
     ],
-    tags=['cadence_hourly']
+    tags = ['cadence_hourly']
 ) }}
 
 WITH base AS (

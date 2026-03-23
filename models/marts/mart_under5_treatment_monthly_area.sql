@@ -1,11 +1,18 @@
 {{ config(
     materialized = 'table',
     indexes = [
+      -- Unique constraint: one row per location x month x metric
       {"columns": ["county_id", "sub_county_id", "community_unit_id", "chp_area_id", "period_start", "metric_id"], "unique": true},
+      -- PRIMARY FIX: full hierarchy text-name + period composite index.
+      -- API/dashboard queries filter on text names (county, sub_county,
+      -- community_unit, chp_area) + period_start. Without this, every
+      -- trend-chart query does a full sequential scan on the entire table.
+      {"columns": ["county", "sub_county", "community_unit", "chp_area", "period_start"]},
+      -- Metric-group index supports panel queries that filter by group
       {"columns": ["metric_group"]}
     ],
     on_schema_change = 'append_new_columns',
-    tags=['cadence_daily']
+    tags = ['cadence_daily']
 ) }}
 WITH location_hierarchy AS (
     SELECT

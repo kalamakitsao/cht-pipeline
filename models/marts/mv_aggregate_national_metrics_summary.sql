@@ -3,13 +3,15 @@
 {{ config(
     materialized = 'table',
     indexes = [
+      -- Unique: one row per period x metric at national level
       {"columns": ["period_id", "metric_id"], "unique": true},
+      -- National tables are small; existing indexes are sufficient
       {"columns": ["period_start", "period_end"]},
       {"columns": ["metric_group", "metric"]},
       {"columns": ["period_label"]}
     ],
     on_schema_change = 'append_new_columns',
-    tags=['cadence_hourly']
+    tags = ['cadence_hourly']
 ) }}
 
 SELECT

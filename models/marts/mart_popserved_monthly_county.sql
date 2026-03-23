@@ -1,11 +1,14 @@
 {{ config(
     materialized = 'table',
     indexes = [
+      -- Unique constraint: one row per county x month x metric
       {"columns": ["county_id", "period_start", "metric_id"], "unique": true},
+      -- Composite index: drives county level dashboard queries
+      {"columns": ["county", "period_start"]},
       {"columns": ["metric_group"]}
     ],
-    on_schema_change='append_new_columns',
-    tags=['cadence_daily']
+    on_schema_change = 'append_new_columns',
+    tags = ['cadence_daily']
 ) }}
 WITH location_hierarchy AS (
     SELECT
