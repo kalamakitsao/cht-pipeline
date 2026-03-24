@@ -1,11 +1,10 @@
 {{ config(
     materialized = 'table',
+    on_schema_change = 'append_new_columns',
     indexes = [
-      {"columns": ["level", "period_start", "metric_id"], "unique": true},
       {"columns": ["period_start"]},
       {"columns": ["metric_group", "metric"]}
     ],
-    on_schema_change = 'append_new_columns',
     tags = ['trends','monthly','national','api']
 ) }}
 

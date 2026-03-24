@@ -1,10 +1,9 @@
 {{ config(
     materialized = 'table',
+    on_schema_change = 'append_new_columns',
     indexes = [
-      {"columns": ["level", "county_id", "county", "period_start", "metric_id"], "unique": true},
       {"columns": ["county", "period_start"]}
     ],
-    on_schema_change = 'append_new_columns',
     tags = ['trends','monthly','county','api']
 ) }}
 

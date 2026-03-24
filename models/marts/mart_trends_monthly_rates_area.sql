@@ -1,12 +1,11 @@
 {{ config(
     materialized = 'table',
+    on_schema_change = 'append_new_columns',
     indexes = [
-      {"columns": ["level", "county_id", "sub_county_id", "community_unit_id", "chp_area_id", "period_start", "metric_id"], "unique": true},
       {"columns": ["county", "sub_county", "community_unit", "chp_area", "period_start"]},
       {"columns": ["county", "sub_county", "community_unit", "period_start"]},
       {"columns": ["county", "period_start"]}
     ],
-    on_schema_change = 'append_new_columns',
     tags = ['trends','monthly','chp_area','api']
 ) }}
 
